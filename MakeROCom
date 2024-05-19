@@ -1,0 +1,4 @@
+# Project:   CBDebugLib
+include MakeCommon
+ObjectList += PseudoFlex PseudoKern PseudoTbox PseudoWimp \
+              PseudoEvnt PseudoIO PseudoExit

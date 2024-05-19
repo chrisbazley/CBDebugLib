@@ -1,7 +1,7 @@
 # CBDebugLib
 (C) 2018 Christopher Bazley
 
-Release 6 (17 Jun 2023)
+Release 7 (19 May 2024)
 
 Introduction
 ------------
@@ -72,7 +72,7 @@ the required header files.
   Three make files are supplied:
 
 - 'Makefile' is intended for use with GNU Make and the GNU C Compiler on Linux.
-- 'Makefile' is intended for use with Acorn Make Utility (AMU) and the
+- 'NMakefile' is intended for use with Acorn Make Utility (AMU) and the
    Norcroft C compiler supplied with the Acorn C/C++ Development Suite.
 - 'GMakefile' is intended for use with GNU Make and the GNU C Compiler on RISC OS.
 
@@ -184,6 +184,14 @@ Release 6 (17 Jun 2023)
   definitions of the debug_set_output function.
 - Annotated unused variables to suppress warnings when debug output is
   disabled at compile time.
+
+Release 7 (19 May 2024)
+- Improved the README.md file for Linux users.
+- A new file, MakeROCom, is used instead of MakeCommon when building for
+  RISC OS (untested), to ensure that most of the library isn't compiled
+  when building for Linux.
+- Code that depends on Acorn's C library is now compiled only if macro
+  ACORN_C is defined.
 
 Contact details
 ---------------

@@ -1,0 +1,32 @@
+# Project:   CBDebugLib
+include MakeROCom
+
+# Tools
+CC = cc
+LibFile = libfile
+
+# Toolflags:
+CCFlags = -g -c -depend !Depend -IC: -throwback -fahi -apcs 3/32/fpe2/swst/fp/nofpr -memaccess -L22-S22-L41 -DACORN_C -DDEBUG_OUTPUT -o $@
+CCModuleFlags = $(CCFlags) -zM -zps1 -ff
+LibFileFlags = -c -o $@
+
+# Acorn Make doesn't find object files in subdirectories if referenced by
+# non-standard file name suffixes so use addprefix not addsuffix here
+DebugObjects = $(addprefix o.,$(ObjectList))
+ModuleObjects = $(addprefix oz.,$(ObjectList))
+
+# Final targets:
+all: @.o.$(LibName)Lib @.oz.$(LibName)Lib
+
+@.o.$(LibName)Lib: $(DebugObjects)
+	$(LibFile) $(LibFileFlags) $(DebugObjects)
+
+@.oz.$(LibName)Lib: $(ModuleObjects)
+	$(LibFile) $(LibFileFlags) $(ModuleObjects)
+
+# User-editable dependencies:
+.SUFFIXES: .o .c .oz
+.c.o:; ${CC} $(CCFlags) $<
+.c.oz:; ${CC} $(CCModuleFlags) $<
+
+# Dynamic dependencies:

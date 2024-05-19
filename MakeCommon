@@ -1,0 +1,3 @@
+# Project:   CBDebugLib
+LibName = CBDebug
+ObjectList = Debug
