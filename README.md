@@ -1,7 +1,7 @@
 # CBDebugLib
 (C) 2018 Christopher Bazley
 
-Release 7 (19 May 2024)
+Release 8 (11 Apr 2025)
 
 Introduction
 ------------
@@ -192,6 +192,10 @@ Release 7 (19 May 2024)
   when building for Linux.
 - Code that depends on Acorn's C library is now compiled only if macro
   ACORN_C is defined.
+
+Release 8 (11 Apr 2025)
+- Dogfooding the _Optional qualifier.
+- Stop treating NULL as a valid value of va_list.
 
 Contact details
 ---------------

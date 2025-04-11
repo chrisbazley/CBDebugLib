@@ -17,8 +17,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/* History:
+  CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
+*/
+
 #ifndef CBDebMisc_h
 #define CBDebMisc_h
+
+#ifdef USE_OPTIONAL
+#include <stdio.h>
+
+#undef NULL
+#define NULL ((_Optional void *)0)
+
+static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
+{
+    return fopen(name, mode);
+}
+#undef fopen
+#define fopen(p, n) optional_fopen(p, n)
+
+#else
+#define _Optional
+#endif
 
 #define NOT_USED(x) ((void)(x))
 

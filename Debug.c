@@ -48,6 +48,8 @@
   CJB: 12-Mar-23: Extended debug_set_output to return the previous mode.
   CJB: 17-Jun-23: Conditionally compiled some functions to guard against
                   multiple definitions of the debug_set_output function.
+  CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
+                  Stop treating NULL as a valid value of va_list.
 */
 
 /* ISO library headers */
@@ -65,6 +67,7 @@
 
 /* Local headers */
 #include "Debug.h"
+#include "Internal/CBDebMisc.h"
 
 #define Report_Text0      0x054C80 /* SWI number for the Reporter module */
 
@@ -85,7 +88,7 @@
 #define BAD_STRING "BAD"
 
 static DebugOutput mode = DebugOutput_None;
-static FILE *log_file;
+static _Optional FILE *log_file;
 #ifdef ACORN_C
 static int syslog_handle;
 #endif
@@ -125,7 +128,7 @@ DebugOutput debug_set_output(DebugOutput output_mode, const char *log_name)
       /* Close the log file in <Wimp$ScrapDir> */
       if (log_file != NULL)
       {
-        fclose(log_file);
+        fclose(&*log_file);
         log_file = NULL;
       }
       break;
@@ -210,7 +213,7 @@ void debug_printfl(const char *format, ...)
   debug_vprintf(format, ap);
   va_end(ap);
 
-  debug_vprintf("\n", NULL);
+  debug_printf("\n");
 }
 
 /* ----------------------------------------------------------------------- */
@@ -248,12 +251,12 @@ void debug_vprintf(const char *format, va_list arg)
       {
         /* Append a string constructed from the format string and variadic
            arguments to the log file */
-        (void)vfprintf(log_file, format, arg);
+        (void)vfprintf(&*log_file, format, arg);
         if (mode == DebugOutput_FlushedFile)
         {
           /* Flush the output stream to ensure that all data has been written
              to the log file. */
-          fflush(log_file);
+          fflush(&*log_file);
         }
       }
       break;
