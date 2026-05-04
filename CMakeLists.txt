@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(CBDebugLib C)
 
+include(FetchContent)
+
+FetchContent_Declare(OptionalAcornC GIT_REPOSITORY https://github.com/chrisbazley/OptionalAcornC.git GIT_TAG main)
+
+FetchContent_MakeAvailable(OptionalAcornC)
+
 set(CMAKE_C_STANDARD 99)
 
 if(MSVC)
