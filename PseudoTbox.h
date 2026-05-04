@@ -48,22 +48,22 @@ History:
 #include <stdbool.h>
 
 /* Acorn C/C++ library headers */
-#include "kernel.h"
-#include "toolbox.h"
-#include "menu.h"
-#include "window.h"
-#include "saveas.h"
-#include "gadgets.h"
-#include "fileinfo.h"
-#include "proginfo.h"
-#include "scale.h"
-#include "printdbox.h"
-#include "colourdbox.h"
-#include "fontdbox.h"
-#include "dcs.h"
-#include "quit.h"
-#include "iconbar.h"
-#include "textarea.h"
+#include <kernel.h>
+#include <toolbox.h>
+#include <menu.h>
+#include <window.h>
+#include <saveas.h>
+#include <gadgets.h>
+#include <fileinfo.h>
+#include <proginfo.h>
+#include <scale.h>
+#include <printdbox.h>
+#include <colourdbox.h>
+#include <fontdbox.h>
+#include <dcs.h>
+#include <quit.h>
+#include <iconbar.h>
+#include <textarea.h>
 
 #ifdef FORTIFY
 

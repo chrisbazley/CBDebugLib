@@ -34,7 +34,7 @@ History:
 #define PseudoFlex_h
 
 /* Acorn C/C++ library headers */
-#include "flex.h"
+#include <flex.h>
 
 #ifdef FORTIFY
 

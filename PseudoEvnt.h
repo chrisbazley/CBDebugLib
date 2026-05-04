@@ -33,9 +33,9 @@ History:
 #define PseudoEvnt_h
 
 /* Acorn C/C++ library headers */
-#include "kernel.h"
-#include "toolbox.h"
-#include "event.h"
+#include <kernel.h>
+#include <toolbox.h>
+#include <event.h>
 
 #ifdef FORTIFY
 

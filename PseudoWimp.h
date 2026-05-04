@@ -38,8 +38,8 @@ History:
 #define PseudoWimp_h
 
 /* Acorn C/C++ library headers */
-#include "kernel.h"
-#include "wimplib.h"
+#include <kernel.h>
+#include <wimplib.h>
 
 #ifdef FORTIFY
 
