@@ -33,10 +33,9 @@ History:
 
 #ifndef PseudoKern_h
 #define PseudoKern_h
-#pragma message("Tracing kernel.h...")
 
 /* Acorn C/C++ library headers */
-#include "kernel.h"
+#include <kernel.h>
 
 #ifdef FORTIFY
 
