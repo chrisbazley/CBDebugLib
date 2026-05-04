@@ -39,6 +39,10 @@ target_compile_options(CBDebug PRIVATE
     $<$<CONFIG:Release>:-O3>
 )
 
+target_link_libraries(CBDebug PRIVATE
+    OptionalAcornC
+)
+
 install(TARGETS CBDebug
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include
