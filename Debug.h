@@ -58,6 +58,8 @@ History:
                   Do-nothing macros are now defined as do {} while(0)
                   instead of if (0)... so their arguments needn't be valid
                   and to prevent unintended association with 'else' blocks.
+  CJB: 17-May-26: Changed variable name 's' to avoid shadowed variable
+                  declaration warnings when assert() is used.
 */
 
 #ifndef Debug_h
@@ -108,9 +110,9 @@ do \
 { \
   if (!(e)) \
   { \
-    char const *const s = #e; \
-    DEBUG("Assertion %s failed in function %s at " LOCATION, s, __func__); \
-    (void)s; \
+    char const *const s_private__ = #e; \
+    DEBUG("Assertion %s failed in function %s at " LOCATION, s_private__, __func__); \
+    (void)s_private__; \
     abort(); \
   } \
 } \
@@ -121,9 +123,9 @@ do \
 { \
   if (!(e)) \
   { \
-    char const *const s = #e; \
-    DEBUG("Assertion %s failed at " LOCATION, s); \
-    (void)s; \
+    char const *const s_private__ = #e; \
+    DEBUG("Assertion %s failed at " LOCATION, s_private__); \
+    (void)s_private__; \
     abort(); \
   } \
 } \
