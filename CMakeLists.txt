@@ -20,8 +20,9 @@ endif()
 # Until Fortify builds are supported here
 set(SOURCES Debug.c)
 file(GLOB PUBLIC_HEADERS "*.h")
+file(GLOB PRIVATE_HEADERS "Internal/*.h")
 
-add_library(CBDebug STATIC ${SOURCES} ${PUBLIC_HEADERS})
+add_library(CBDebug STATIC ${SOURCES} ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 
 set_target_properties(CBDebug PROPERTIES
     PUBLIC_HEADER "${PUBLIC_HEADERS}"
