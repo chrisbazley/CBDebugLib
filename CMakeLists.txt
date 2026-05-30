@@ -33,11 +33,6 @@ target_include_directories(CBDebug PUBLIC .)
 
 target_compile_definitions(CBDebug PRIVATE
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
-    $<$<CONFIG:Release>:NDEBUG>
-)
-
-target_compile_options(CBDebug PRIVATE
-    $<$<CONFIG:Release>:-O3>
 )
 
 target_link_libraries(CBDebug PRIVATE
