@@ -50,6 +50,7 @@
                   multiple definitions of the debug_set_output function.
   CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
                   Stop treating NULL as a valid value of va_list.
+  CJB: 07-Jun-26: Guard against log file name buffer overflow.
 */
 
 /* ISO library headers */
@@ -159,10 +160,16 @@ DebugOutput debug_set_output(DebugOutput output_mode, const char *log_name)
     {
       /* Open a file in <Wimp$ScrapDir> to append debugging output */
       char file_path[256];
-
-      strcpy(file_path, "<Wimp$ScrapDir>.");
-      strcat(file_path, log_name);
-      log_file = fopen(file_path, "a");
+      int nout;
+#ifndef OLD_SCL_STUBS
+      nout = snprintf(file_path, sizeof(file_path), "<Wimp$ScrapDir>.%s", log_name);
+#else
+      nout = sprintf(file_path, "<Wimp$ScrapDir>.%s", log_name);
+#endif
+      if (nout > 0 && nout < sizeof(file_path))
+      {
+        log_file = fopen(file_path, "a");
+      }
       break;
     }
 #ifdef ACORN_C
