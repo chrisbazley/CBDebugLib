@@ -51,6 +51,8 @@
   CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
                   Stop treating NULL as a valid value of va_list.
   CJB: 07-Jun-26: Guard against log file name buffer overflow.
+  CJB: 08-Jun-26: Avoid mixed-signedness comparison in log file name
+                  buffer overflow check.
 */
 
 /* ISO library headers */
@@ -166,7 +168,7 @@ DebugOutput debug_set_output(DebugOutput output_mode, const char *log_name)
 #else
       nout = sprintf(file_path, "<Wimp$ScrapDir>.%s", log_name);
 #endif
-      if (nout > 0 && nout < sizeof(file_path))
+      if (nout > 0 && (size_t)nout < sizeof(file_path))
       {
         log_file = fopen(file_path, "a");
       }
