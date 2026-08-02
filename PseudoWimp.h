@@ -32,6 +32,8 @@ History:
                   lets unit tests specify the information returned by
                   subsequent calls to wimp_get_pointer_info.
   CJB: 31-Jan-16: Intercepted wimp_set_colour to allow error simulation.
+  CJB: 02-Aug-26: Explicitly allow output arguments of pseudo_wimp_get_message2
+                  to be null.
 */
 
 #ifndef PseudoWimp_h
@@ -125,7 +127,11 @@ void pseudo_wimp_get_message(unsigned int index, WimpMessage *msg);
     */
 
 
-void pseudo_wimp_get_message2(unsigned int index, int *code, WimpPollBlock *block, int *handle, int *icon);
+void pseudo_wimp_get_message2(unsigned int index,
+                              _Optional int *code,
+                              _Optional WimpPollBlock *block,
+                              _Optional int *handle,
+                              _Optional int *icon);
    /*
     * Gets an outgoing Wimp message previously intercepted by the alternative
     * implementation of wimp_send_message. The given message 'index' must be

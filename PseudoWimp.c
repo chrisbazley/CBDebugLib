@@ -48,6 +48,8 @@
                   (for cancellation). More debugging output for drags.
   CJB: 17-Jun-23: Annotated unused variables to suppress warnings when
                   debug output is disabled at compile time.
+  CJB: 02-Aug-26: Explicitly allow output arguments of pseudo_wimp_get_message2
+                  to be null.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -148,7 +150,9 @@ void pseudo_wimp_get_message(unsigned int index, WimpMessage *msg)
   *msg = msgs[index].block.user_message;
 }
 
-void pseudo_wimp_get_message2(unsigned int index, int *code, WimpPollBlock *block, int *handle, int *icon)
+void pseudo_wimp_get_message2(unsigned int index, _Optional int *code,
+                              _Optional WimpPollBlock *block,
+                              _Optional int *handle, _Optional int *icon)
 {
   assert(index < msg_count);
 
