@@ -50,6 +50,11 @@
                   debug output is disabled at compile time.
   CJB: 02-Aug-26: Explicitly allow output arguments of pseudo_wimp_get_message2
                   to be null.
+  CJB: 24-Aug-26: Fix broken checks for 'more' in pseudo_wimp_redraw_window
+                  and pseudo_wimp_get_rectangle (which would always have
+                  continued the loop), and assert that the pointer argument
+                  is not null.
+                  Assert that null is not passed to pseudo_wimp_read_sys_info.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -91,7 +96,7 @@ _kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, con
 {
   _kernel_oserror *e = pseudokern_fail(file, line);
 
-  /* results can be NULL */
+  assert(results);
   if (e == NULL)
     e = wimp_read_sys_info(reason, results);
 
@@ -328,7 +333,7 @@ _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *mo
   _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
-  /* more can be NULL */
+  assert(more);
   if (e == NULL)
   {
     e = wimp_redraw_window(block, more);
@@ -341,7 +346,7 @@ _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *mo
 
     b.window_handle = block->window_handle;
     for (e2 = wimp_redraw_window(&b, more);
-         e2 == NULL && more;
+         e2 == NULL && *more;
          e2 = wimp_get_rectangle(&b, more))
     {
       /* Do nothing */
@@ -356,7 +361,7 @@ _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *mo
   _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
-  /* more can be NULL */
+  assert(more);
   if (e == NULL)
   {
     e = wimp_get_rectangle(block, more);
@@ -369,7 +374,7 @@ _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *mo
 
     b.window_handle = block->window_handle;
     for (e2 = wimp_get_rectangle(&b, more);
-         e2 == NULL && more;
+         e2 == NULL && *more;
          e2 = wimp_get_rectangle(&b, more))
     {
       /* Do nothing */
