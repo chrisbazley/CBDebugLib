@@ -29,6 +29,8 @@ History:
   CJB: 01-Jan-15: Created.
   CJB: 13-Nov-16: Added interceptor versions of fputs and fprintf.
   CJB: 09-Dec-16: Added interceptor versions of fgetc and fputc.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
 */
 
 #ifndef PseudoIO_h
@@ -36,6 +38,10 @@ History:
 
 /* ISO library headers */
 #include <stdio.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 #ifdef FORTIFY
 
@@ -76,7 +82,7 @@ History:
 
 #endif
 
-FILE *pseudo_fopen(const char *filename, const char *mode, const char *file, unsigned long line);
+_Optional FILE *pseudo_fopen(const char *filename, const char *mode, const char *file, unsigned long line);
 
 void pseudo_rewind(FILE *stream, const char *file, unsigned long line);
 

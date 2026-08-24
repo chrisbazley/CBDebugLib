@@ -29,6 +29,9 @@ History:
   CJB: 27-Dec-14: Exported the pseudokern_fail function for internal use.
   CJB: 31-Jan-16: Fixed an error in the definition of macro _kernel_swi_c
                   which referred to a non-existent argument 'carr'.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
+
 */
 
 #ifndef PseudoKern_h
@@ -36,6 +39,10 @@ History:
 
 /* Acorn C/C++ library headers */
 #include <kernel.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 #ifdef FORTIFY
 
@@ -93,11 +100,11 @@ History:
 
 #endif
 
-_kernel_oserror *pseudokern_swi(int no, _kernel_swi_regs *in,
+_Optional _kernel_oserror *pseudokern_swi(int no, _kernel_swi_regs *in,
                                 _kernel_swi_regs *out, const char *file,
                                 unsigned long line);
 
-_kernel_oserror *pseudokern_swi_c(int no, _kernel_swi_regs *in,
+_Optional _kernel_oserror *pseudokern_swi_c(int no, _kernel_swi_regs *in,
                                   _kernel_swi_regs *out, int *carry,
                                   const char *file, unsigned long line);
 
@@ -129,17 +136,17 @@ int pseudokern_osargs(int op, unsigned handle, int arg, const char *file,
 
 int pseudokern_oscli(const char *s, const char *file, unsigned long line);
 
-_kernel_oserror *pseudokern_getenv(const char *name, char *buffer,
-                                   unsigned size, const char *file,
-                                   unsigned long line);
+_Optional _kernel_oserror *pseudokern_getenv(const char *name, char *buffer,
+                                             unsigned size, const char *file,
+                                             unsigned long line);
 
-_kernel_oserror *pseudokern_setenv(const char *name, const char *value,
-                                   const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudokern_setenv(const char *name, const char *value,
+                                             const char *file, unsigned long line);
 
 int pseudokern_system(const char *string, int chain, const char *file,
                       unsigned long line);
 
 /* Internal function for use by other pseudo modules. */
-_kernel_oserror *pseudokern_fail(const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudokern_fail(const char *file, unsigned long line);
 
 #endif

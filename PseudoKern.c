@@ -23,6 +23,9 @@
   CJB: 18-Apr-15: Assertions are now provided by debug.h.
   CJB: 13-Jun-20: Use new Fortify_AllowAllocate to avoid accumulating huge
                   numbers of 'freed' dummy memory allocations.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
+
 */
 
 #undef FORTIFY /* Prevent macro redirection of _kernel_... calls to
@@ -38,12 +41,12 @@
 
 /* Local headers */
 #include "PseudoKern.h"
-#include "Internal/CBDebMisc.h"
 #include "Debug.h"
+#include "Internal/CBDebMisc.h"
 
-_kernel_oserror *pseudokern_fail(const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudokern_fail(const char *file, unsigned long line)
 {
-  _kernel_oserror *e = NULL;
+  _Optional _kernel_oserror *e = NULL;
 
   /* CJB's extra Fortify function to avoid accumulating
      huge numbers of 'freed' dummy memory allocations. */
@@ -64,13 +67,13 @@ _kernel_oserror *pseudokern_fail(const char *file, unsigned long line)
   return e;
 }
 
-_kernel_oserror *pseudokern_swi(int no,
+_Optional _kernel_oserror *pseudokern_swi(int no,
                                 _kernel_swi_regs *in,
                                 _kernel_swi_regs *out,
                                 const char *file,
                                 unsigned long line)
 {
-  _kernel_oserror *e = NULL;
+  _Optional _kernel_oserror *e = NULL;
 
   assert(in != NULL);
   assert(out != NULL);
@@ -86,14 +89,14 @@ _kernel_oserror *pseudokern_swi(int no,
   return e;
 }
 
-_kernel_oserror *pseudokern_swi_c(int no,
+_Optional _kernel_oserror *pseudokern_swi_c(int no,
                                   _kernel_swi_regs *in,
                                   _kernel_swi_regs *out,
                                   int *carry,
                                   const char *file,
                                   unsigned long line)
 {
-  _kernel_oserror *e = NULL;
+  _Optional _kernel_oserror *e = NULL;
 
   assert(in != NULL);
   assert(out != NULL);
@@ -250,13 +253,13 @@ int pseudokern_oscli(const char *s, const char *file, unsigned long line)
   return result;
 }
 
-_kernel_oserror *pseudokern_getenv(const char *name,
-                                   char *buffer,
-                                   unsigned size,
-                                   const char *file,
-                                   unsigned long line)
+_Optional _kernel_oserror *pseudokern_getenv(const char *name,
+                                             char *buffer,
+                                             unsigned size,
+                                             const char *file,
+                                             unsigned long line)
 {
-  _kernel_oserror *e;
+  _Optional _kernel_oserror *e;
 
   assert(name != NULL);
   e = pseudokern_fail(file, line);
@@ -266,12 +269,12 @@ _kernel_oserror *pseudokern_getenv(const char *name,
   return e;
 }
 
-_kernel_oserror *pseudokern_setenv(const char *name,
-                                   const char *value,
-                                   const char *file,
-                                   unsigned long line)
+_Optional _kernel_oserror *pseudokern_setenv(const char *name,
+                                             const char *value,
+                                             const char *file,
+                                             unsigned long line)
 {
-  _kernel_oserror *e;
+  _Optional _kernel_oserror *e;
 
   assert(name != NULL);
   e = pseudokern_fail(file, line);

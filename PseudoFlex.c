@@ -47,6 +47,9 @@
   CJB: 03-Apr-21: More data in debugging output.
   CJB: 17-Jun-23: Annotated unused variables to suppress warnings when
                   debug output is disabled at compile time.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
+
 */
 
 /* ISO library headers */
@@ -56,13 +59,14 @@
 /* Acorn C/C++ library headers */
 #include "flex.h"
 
-/* Local headers */
-#include "PseudoFlex.h"
-#include "Internal/CBDebMisc.h"
-#include "Debug.h"
 #include "LinkedList.h"
 
-#include "fortify.h"
+/* Local headers */
+#include "PseudoFlex.h"
+#include "Debug.h"
+#include "Internal/CBDebMisc.h"
+
+#include "Fortify.h"
 
 /* -----------------------------------------------------------------------
                           Internal library data
@@ -84,7 +88,7 @@ static LinkedList block_list;
 /* ----------------------------------------------------------------------- */
 /*                       Function prototypes                               */
 
-static PseudoFlexRecord *find_anchor(flex_ptr anchor);
+static _Optional PseudoFlexRecord *find_anchor(flex_ptr anchor);
 
 /* -----------------------------------------------------------------------
                          Public library functions
@@ -96,7 +100,7 @@ int PseudoFlex_alloc(flex_ptr anchor, int n, const char *file, unsigned long lin
   assert(n >= 0);
 
   /* Allocate memory for a private record of a new pseudo-flex block */
-  PseudoFlexRecord *const pfr = malloc(sizeof(*pfr));
+  _Optional PseudoFlexRecord *const pfr = malloc(sizeof(*pfr));
   if (pfr == NULL)
   {
     DEBUG("PseudoFlex: Memory allocation failed! (1)");
@@ -107,7 +111,7 @@ int PseudoFlex_alloc(flex_ptr anchor, int n, const char *file, unsigned long lin
      pointer in the specified 'flex anchor'. It is possible to allocate a
      flex block of 0 bytes and therefore Fortify must have been compiled
      without FORTIFY_FAIL_ON_ZERO_MALLOC. */
-  void *const blk = Fortify_malloc(n, file, line);
+  _Optional void *const blk = Fortify_malloc(n, file, line);
   if (blk == NULL)
   {
     free(pfr);
@@ -123,7 +127,7 @@ int PseudoFlex_alloc(flex_ptr anchor, int n, const char *file, unsigned long lin
   linkedlist_insert(&block_list, NULL, &pfr->list_item);
 
   /* Store the address of the heap block in the caller's anchor */
-  *anchor = blk;
+  *anchor = &*blk;
   DEBUG("PseudoFlex: Allocated block %p of %d bytes anchored at %p",
     *anchor, n, (void *)anchor);
 
@@ -139,7 +143,7 @@ void PseudoFlex_free(flex_ptr anchor, const char *file, unsigned long line)
 
   /* Search our linked list of allocated block records for one which describes
      the specified flex anchor */
-  PseudoFlexRecord *const pfr = find_anchor(anchor);
+  _Optional PseudoFlexRecord *const pfr = find_anchor(anchor);
   assert(pfr != NULL);
   if (pfr != NULL)
   {
@@ -151,7 +155,7 @@ void PseudoFlex_free(flex_ptr anchor, const char *file, unsigned long line)
 
     /* Free the actual heap block */
     Fortify_free(*anchor, file, line);
-    *anchor = NULL;
+    *anchor = 0;
   }
 }
 
@@ -164,7 +168,7 @@ int PseudoFlex_size(flex_ptr anchor)
 
   /* Search our linked list of allocated block records for one which describes
      the specified flex anchor */
-  PseudoFlexRecord *const pfr = find_anchor(anchor);
+  _Optional PseudoFlexRecord *const pfr = find_anchor(anchor);
   assert(pfr != NULL);
   if (pfr == NULL)
     return 0; /* size unknown (bad flex anchor) */
@@ -186,20 +190,20 @@ int PseudoFlex_extend(flex_ptr anchor, int newsize, const char *file, unsigned l
 
   /* Search our linked list of allocated block records for one which describes
      the specified flex anchor */
-  PseudoFlexRecord *const pfr = find_anchor(anchor);
+  _Optional PseudoFlexRecord *const pfr = find_anchor(anchor);
   assert(pfr != NULL);
   if (pfr != NULL)
   {
     /* Attempt to resize the heap block. It is possible to truncate a flex
        block to 0 bytes and therefore Fortify must have been compiled without
        FORTIFY_FAIL_ON_ZERO_MALLOC. */
-    void *const new_addr = Fortify_realloc(*anchor, newsize, file, line);
+    _Optional void *const new_addr = Fortify_realloc(*anchor, newsize, file, line);
     if (new_addr != NULL)
     {
       /* Update the anchor to point at the resized heap block */
       DEBUG("PseudoFlex: Resized block %p anchored at %p to %d bytes, new address %p",
             *anchor, (void *)anchor, newsize, new_addr);
-      *anchor = new_addr;
+      *anchor = &*new_addr;
 
       /* Update our record of the current block size */
       pfr->size = newsize;
@@ -220,11 +224,11 @@ int PseudoFlex_midextend(flex_ptr anchor, int at, int by, const char *file, unsi
 
   /* Search our linked list of allocated block records for one which describes
      the specified flex anchor */
-  PseudoFlexRecord *const pfr = find_anchor(anchor);
+  _Optional PseudoFlexRecord *const pfr = find_anchor(anchor);
   assert(pfr != NULL);
   if (pfr != NULL)
   {
-    char *new_addr;
+    _Optional char *new_addr;
     int size = pfr->size,
         newsize = size + by;
     size_t bytes_to_copy = size - at;
@@ -256,7 +260,7 @@ int PseudoFlex_midextend(flex_ptr anchor, int at, int by, const char *file, unsi
       /* Replicate the data below the truncation point, in the new block */
       DEBUG_VERBOSE("PseudoFlex: Copying %d bytes from %p to %p",
             at + by, *anchor, new_addr);
-      memcpy(new_addr, *anchor, at + by);
+      memcpy(&*new_addr, *anchor, at + by);
 
       /* Copy data above the truncation point downwards */
       DEBUG_VERBOSE("PseudoFlex: Copying %zu bytes from %p to %p", bytes_to_copy,
@@ -288,7 +292,7 @@ int PseudoFlex_midextend(flex_ptr anchor, int at, int by, const char *file, unsi
           by, at, new_addr);
 
     /* Update the anchor to point at the resized heap block */
-    *anchor = new_addr;
+    *anchor = &*new_addr;
 
     /* Update our record of the current block size */
     pfr->size = newsize;
@@ -307,7 +311,7 @@ int PseudoFlex_reanchor(flex_ptr to, flex_ptr from)
 
   /* Search our linked list of allocated block records for one which describes
      the specified flex anchor */
-  PseudoFlexRecord *const pfr = find_anchor(from);
+  _Optional PseudoFlexRecord *const pfr = find_anchor(from);
   assert(pfr != NULL);
   if (pfr != NULL) {
     /* Store the address of the new anchor for the flex block, so that we will
@@ -318,7 +322,7 @@ int PseudoFlex_reanchor(flex_ptr to, flex_ptr from)
           (void *)from, (void *)to);
 
     *to = *from; /* copy the heap block pointer from old anchor to new */
-    *from = NULL; /* prevent reuse of old anchor */
+    *from = 0; /* prevent reuse of old anchor */
 
     return 1; /* success */
   } else {
@@ -343,7 +347,7 @@ int PseudoFlex_set_budge(int newstate)
 
 /* ----------------------------------------------------------------------- */
 
-void PseudoFlex_init(char *program_name, int *error_fd, int dynamic_size)
+void PseudoFlex_init(char *program_name, _Optional int *error_fd, int dynamic_size)
 {
   DEBUG("PseudoFlex: Initialised with program name '%s', messages file %p, "
         "and DA limit %d", program_name, (void *)error_fd, dynamic_size);
@@ -353,7 +357,7 @@ void PseudoFlex_init(char *program_name, int *error_fd, int dynamic_size)
 
   /* Check that Fortify was compiled without FORTIFY_FAIL_ON_ZERO_MALLOC */
   int const percent = Fortify_SetAllocateFailRate(0);
-  void *const test = Fortify_malloc(0, __FILE__, __LINE__);
+  _Optional void *const test = Fortify_malloc(0, __FILE__, __LINE__);
   assert(test != NULL);
   Fortify_free(test, __FILE__, __LINE__);
   (void)Fortify_SetAllocateFailRate(percent);
@@ -366,11 +370,11 @@ void PseudoFlex_save_heap_info(char *filename)
   DEBUG("PseudoFlex: Append heap info to file '%s'", filename);
   assert(filename != NULL);
 
-  FILE *const f = fopen(filename, "a");
+  _Optional FILE *const f = fopen(filename, "a");
   if (f != NULL)
   {
-    fputs("PseudoFlex does not support flex_save_heap_info", f);
-    fclose(f);
+    fputs("PseudoFlex does not support flex_save_heap_info", &*f);
+    fclose(&*f);
   }
 }
 
@@ -412,19 +416,21 @@ static bool block_has_anchor(LinkedList *list, LinkedListItem *item, void *arg)
 
 /* ----------------------------------------------------------------------- */
 
-static PseudoFlexRecord *find_anchor(flex_ptr anchor)
+static _Optional PseudoFlexRecord *find_anchor(flex_ptr anchor)
 {
-  PseudoFlexRecord *const pfr = (PseudoFlexRecord *)linkedlist_for_each(
-           &block_list, block_has_anchor, anchor);
-  if (pfr == NULL)
+  _Optional LinkedListItem *const item =
+      linkedlist_for_each(&block_list, block_has_anchor, anchor);
+
+  if (item == NULL)
   {
     DEBUG("PseudoFlex: Anchor %p not found!", (void *)anchor);
+    return NULL;
   }
-  else
-  {
-    DEBUG_VERBOSE("PseudoFlex: Anchor %p found in record %p",
-                  (void *)anchor, (void *)pfr);
-  }
+
+  PseudoFlexRecord *const pfr =
+      CONTAINER_OF(item, PseudoFlexRecord, list_item);
+  DEBUG_VERBOSE("PseudoFlex: Anchor %p found in record %p",
+                (void *)anchor, (void *)pfr);
 
   return pfr;
 }

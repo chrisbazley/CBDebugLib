@@ -19,6 +19,7 @@
 
 /* History:
   CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
+  CJB: 25-Aug-26: Add a definition of CONTAINER_OF.
 */
 
 #ifndef CBDebMisc_h
@@ -61,5 +62,9 @@ enum
 {
   DUMMY_ERRNO = 255
 };
+
+#define CONTAINER_OF(addr, type, member) \
+  ((void)sizeof(0 ? &((type *)0)->member : (addr)), \
+  (type *)(((char *)(addr)) - offsetof(type, member)))
 
 #endif /* CBDebMisc_h */

@@ -34,6 +34,8 @@
                   the final null event it receives.
   CJB: 29-Nov-20: Fixed a null pointer dereference in event_poll_idle when
                   null is passed instead of an event_code address.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -48,19 +50,20 @@
 #include "swis.h"
 #include "wimplib.h"
 
+#include "LinkedList.h"
+
 /* Local headers */
 #include "Debug.h"
-#include "Internal/CBDebMisc.h"
 #include "PseudoEvnt.h"
 #include "PseudoKern.h"
 #include "PseudoTbox.h"
-#include "LinkedList.h"
+#include "Internal/CBDebMisc.h"
 
-#include "fortify.h"
+#include "Fortify.h"
 
 /* These lists of event handlers are currently used only to detect leaks */
 static LinkedList wimp_handlers, tb_handlers, msg_handlers;
-static IdBlock *client_block;
+static _Optional IdBlock *client_block;
 
 typedef struct
 {
@@ -91,7 +94,7 @@ typedef struct
 }
 PseudoEvent_Message_Handler;
 
-static _kernel_oserror *oom(void)
+static _Optional _kernel_oserror *oom(void)
 {
   /* Look up a generic out-of-memory error. Note that this also takes
      care of setting _kernel_last_oserror. */
@@ -105,14 +108,14 @@ static _kernel_oserror *oom(void)
   return _kernel_swi(MessageTrans_ErrorLookup, &regs, &regs);
 }
 
-IdBlock *pseudo_event_get_client_id_block(void)
+_Optional IdBlock *pseudo_event_get_client_id_block(void)
 {
   return client_block;
 }
 
-_kernel_oserror *pseudo_event_initialise(IdBlock *block, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_initialise(IdBlock *block, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   if (e == NULL)
   {
@@ -130,9 +133,9 @@ _kernel_oserror *pseudo_event_initialise(IdBlock *block, const char *file, unsig
   return e;
 }
 
-_kernel_oserror *pseudo_event_set_mask(unsigned int mask, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_set_mask(unsigned int mask, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   if (e == NULL)
     e = event_set_mask(mask);
@@ -171,9 +174,9 @@ static void print_event(int event_code, WimpPollBlock *poll_block)
   }
 }
 
-_kernel_oserror *pseudo_event_poll(int *event_code, WimpPollBlock *poll_block, void *poll_word, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_poll(_Optional int *event_code, _Optional WimpPollBlock *poll_block, _Optional void *poll_word, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   if (e == NULL)
   {
@@ -194,18 +197,18 @@ _kernel_oserror *pseudo_event_poll(int *event_code, WimpPollBlock *poll_block, v
     }
     else
     {
-      print_event(*event_code, poll_block);
+      print_event(*event_code, &*poll_block);
     }
   }
 
   return e;
 }
 
-_kernel_oserror *pseudo_event_wait_for_idle(void)
+_Optional _kernel_oserror *pseudo_event_wait_for_idle(void)
 {
   unsigned int count = 511;
   int event_code;
-  _kernel_oserror *e;
+  _Optional _kernel_oserror *e;
 
   do
   {
@@ -220,7 +223,8 @@ _kernel_oserror *pseudo_event_wait_for_idle(void)
     else
     {
       WimpPollBlock poll_block;
-      e = wimp_poll(mask & ~Wimp_Poll_NullMask, &poll_block, NULL, &event_code);
+      int pollword;
+      e = wimp_poll(mask & ~Wimp_Poll_NullMask, &poll_block, &pollword, &event_code);
       if (e != NULL)
       {
         DEBUGF("wimp_poll error: 0x%x %s\n", e->errnum, e->errmess);
@@ -240,9 +244,9 @@ _kernel_oserror *pseudo_event_wait_for_idle(void)
   return e;
 }
 
-_kernel_oserror *pseudo_event_poll_idle(int *event_code, WimpPollBlock *poll_block, unsigned int earliest, void *poll_word, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_poll_idle(_Optional int *event_code, _Optional WimpPollBlock *poll_block, unsigned int earliest, _Optional void *poll_word, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   if (e == NULL)
   {
@@ -263,17 +267,17 @@ _kernel_oserror *pseudo_event_poll_idle(int *event_code, WimpPollBlock *poll_blo
     }
     else
     {
-      print_event(*event_code, poll_block);
+      print_event(*event_code, &*poll_block);
     }
   }
 
   return e;
 }
 
-_kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = NULL;
-  PseudoEvent_Toolbox_Handler *record;
+  _Optional _kernel_oserror *e = NULL;
+  _Optional PseudoEvent_Toolbox_Handler *record;
 
   DEBUGF("event_register_toolbox_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, (unsigned)object_id, file, line);
 
@@ -318,10 +322,10 @@ static bool toolbox_handler_matches(LinkedList *list, LinkedListItem *item, void
          to_match->handle == record->handle;
 }
 
-_kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
   PseudoEvent_Toolbox_Handler to_match;
-  LinkedListItem *item;
+  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_toolbox_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, (unsigned)object_id, file, line);
 
@@ -332,7 +336,7 @@ _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int
 
   item = linkedlist_for_each(&tb_handlers, toolbox_handler_matches, &to_match);
   assert(item != NULL);
-  linkedlist_remove(&tb_handlers, item);
+  linkedlist_remove(&tb_handlers, &*item);
   Fortify_free(item, file, line);
 
   return event_deregister_toolbox_handler(object_id, event_code, handler, handle);
@@ -355,7 +359,7 @@ static bool deregister_toolbox_handlers_for_object(LinkedList *list, LinkedListI
   return false; /* next list item */
 }
 
-_kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object(int object_id, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object(int object_id, const char *file, unsigned long line)
 {
   NOT_USED(file);
   NOT_USED(line);
@@ -367,10 +371,10 @@ _kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object(int object_
   return event_deregister_toolbox_handlers_for_object(object_id);
 }
 
-_kernel_oserror *pseudo_event_register_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_register_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = NULL;
-  PseudoEvent_Message_Handler *record;
+  _Optional _kernel_oserror *e = NULL;
+  _Optional PseudoEvent_Message_Handler *record;
 
   DEBUGF("event_register_message_handler called for msg 0x%x at %s:%lu\n", msg_no, file, line);
 
@@ -413,10 +417,10 @@ static bool message_handler_matches(LinkedList *list, LinkedListItem *item, void
          to_match->handle == record->handle;
 }
 
-_kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
 {
   PseudoEvent_Message_Handler to_match;
-  LinkedListItem *item;
+  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_message_handler called for msg 0x%x at %s:%lu\n", msg_no, file, line);
 
@@ -426,16 +430,16 @@ _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessage
 
   item = linkedlist_for_each(&msg_handlers, message_handler_matches, &to_match);
   assert(item != NULL);
-  linkedlist_remove(&msg_handlers, item);
+  linkedlist_remove(&msg_handlers, &*item);
   Fortify_free(item, file, line);
 
   return event_deregister_message_handler(msg_no, handler, handle);
 }
 
-_kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = NULL;
-  PseudoEvent_Wimp_Handler *record;
+  _Optional _kernel_oserror *e = NULL;
+  _Optional PseudoEvent_Wimp_Handler *record;
 
   DEBUGF("event_register_wimp_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, object_id, file, line);
 
@@ -480,10 +484,10 @@ static bool wimp_handler_matches(LinkedList *list, LinkedListItem *item, void *a
          to_match->handle == record->handle;
 }
 
-_kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
   PseudoEvent_Wimp_Handler to_match;
-  LinkedListItem *item;
+  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_wimp_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, object_id, file, line);
 
@@ -494,7 +498,7 @@ _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int ev
 
   item = linkedlist_for_each(&wimp_handlers, wimp_handler_matches, &to_match);
   assert(item != NULL);
-  linkedlist_remove(&wimp_handlers, item);
+  linkedlist_remove(&wimp_handlers, &*item);
   Fortify_free(item, file, line);
 
   return event_deregister_wimp_handler(object_id, event_code, handler, handle);
@@ -517,7 +521,7 @@ static bool deregister_wimp_handlers_for_object(LinkedList *list, LinkedListItem
   return false; /* next list item */
 }
 
-_kernel_oserror *pseudo_event_deregister_wimp_handlers_for_object(int object_id, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_event_deregister_wimp_handlers_for_object(int object_id, const char *file, unsigned long line)
 {
   NOT_USED(file);
   NOT_USED(line);

@@ -37,6 +37,10 @@ History:
 #include <toolbox.h>
 #include <event.h>
 
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
+
 #ifdef FORTIFY
 
 /* Define macros to intercept calls to Acorn's event library and replace
@@ -81,39 +85,39 @@ History:
 
 #endif
 
-_kernel_oserror *pseudo_event_initialise(IdBlock *block, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_initialise(IdBlock *block, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_set_mask(unsigned int mask, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_set_mask(unsigned int mask, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_poll(int *event_code, WimpPollBlock *poll_block, void *poll_word, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_poll(_Optional int *event_code, _Optional WimpPollBlock *poll_block, _Optional void *poll_word, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_poll_idle(int *event_code, WimpPollBlock *poll_block, unsigned int earliest, void *poll_word, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_poll_idle(_Optional int *event_code, _Optional WimpPollBlock *poll_block, unsigned int earliest, _Optional void *poll_word, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object (int object_id, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object (int object_id, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_register_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_register_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_event_deregister_wimp_handlers_for_object(int object_id, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_event_deregister_wimp_handlers_for_object(int object_id, const char *file, unsigned long line);
 
 /* The following functions are for use in unit tests */
 
-IdBlock *pseudo_event_get_client_id_block(void);
+_Optional IdBlock *pseudo_event_get_client_id_block(void);
    /*
     * Gets the Toolbox ID block registered upon initialisation.
     * Returns: a pointer to the client application's ID block.
     */
 
-_kernel_oserror *pseudo_event_wait_for_idle(void);
+_Optional _kernel_oserror *pseudo_event_wait_for_idle(void);
    /*
     * Unmask all events and call event_poll until it returns a null event.
     * Used in tests to ensure that all events entailed by a stimulus have

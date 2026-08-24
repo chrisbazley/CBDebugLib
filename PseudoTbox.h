@@ -40,6 +40,8 @@ History:
                   of a function (since it's impossible to do so afterwards).
   CJB: 27-Nov-21: Added interception of the gadget_set_focus function.
   CJB: 19-Aug-22: Can now be used as a proxy for textarea.h.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
 */
 
 #ifndef PseudoTbox_h
@@ -64,6 +66,10 @@ History:
 #include <quit.h>
 #include <iconbar.h>
 #include <textarea.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 #ifdef FORTIFY
 
@@ -238,127 +244,127 @@ History:
 
 #endif
 
-_kernel_oserror *pseudo_toolbox_initialise( unsigned int flags,
+_Optional _kernel_oserror *pseudo_toolbox_initialise( unsigned int flags,
                                              int wimp_version,
                                              int *wimp_messages,
                                              int *toolbox_events,
                                              char *directory,
                                              MessagesFD *mfd,
                                              IdBlock *idb,
-                                             int *current_wimp_version,
-                                             int *task,
-                                             void **sprite_area,
+                                             _Optional int *current_wimp_version,
+                                             _Optional int *task,
+                                             _Optional void *_Optional *sprite_area,
                                              const char *file,
                                              unsigned long line
                                            );
 
-_kernel_oserror *pseudo_toolbox_create_object(unsigned int flags, void *name_or_template, ObjectId *id, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_create_object(unsigned int flags, void *name_or_template, _Optional ObjectId *id, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_delete_object(unsigned int flags, ObjectId id, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_delete_object(unsigned int flags, ObjectId id, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_show_object(unsigned int flags, ObjectId id, int show_type, void *type, ObjectId parent, ComponentId parent_component, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_show_object(unsigned int flags, ObjectId id, int show_type, _Optional void *type, ObjectId parent, ComponentId parent_component, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_hide_object(unsigned int flags, ObjectId id, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_hide_object(unsigned int flags, ObjectId id, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_set_client_handle(unsigned int flags, ObjectId id, void *client_handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_set_client_handle(unsigned int flags, ObjectId id, void *client_handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_get_client_handle(unsigned int flags, ObjectId id, void *client_handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_get_client_handle(unsigned int flags, ObjectId id, void *_Optional *client_handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_get_object_class(unsigned int flags, ObjectId id, ObjectClass *object_class, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_get_object_class(unsigned int flags, ObjectId id, _Optional ObjectClass *object_class, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_toolbox_get_object_state(unsigned int flags, ObjectId id, unsigned int *state, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_toolbox_get_object_state(unsigned int flags, ObjectId id, _Optional unsigned int *state, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_iconbar_get_icon_handle(unsigned int flags, ObjectId iconbar, int *icon_handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_iconbar_get_icon_handle(unsigned int flags, ObjectId iconbar, _Optional int *icon_handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_set_file_name(unsigned int flags, ObjectId saveas, char *file_name, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_set_file_name(unsigned int flags, ObjectId saveas, char *file_name, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_set_file_type(unsigned int flags, ObjectId saveas, int file_type, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_set_file_type(unsigned int flags, ObjectId saveas, int file_type, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_get_file_type(unsigned int flags, ObjectId saveas, int *file_type, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_get_file_type(unsigned int flags, ObjectId saveas, _Optional int *file_type, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_set_file_size(unsigned int flags, ObjectId saveas, int file_size, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_set_file_size(unsigned int flags, ObjectId saveas, int file_size, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_buffer_filled(unsigned int flags, ObjectId saveas, void *buffer, int bytes_written, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_buffer_filled(unsigned int flags, ObjectId saveas, void *buffer, int bytes_written, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_file_save_completed(unsigned int flags, ObjectId saveas, char *filename, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_file_save_completed(unsigned int flags, ObjectId saveas, char *filename, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_saveas_get_window_id(unsigned int flags, ObjectId saveas, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_saveas_get_window_id(unsigned int flags, ObjectId saveas, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_radiobutton_set_state(unsigned int flags, ObjectId window, ComponentId radio_button, int state, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_radiobutton_set_state(unsigned int flags, ObjectId window, ComponentId radio_button, int state, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_radiobutton_get_state(unsigned int flags, ObjectId window, ComponentId radio_button, int *state, ComponentId *selected, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_radiobutton_get_state(unsigned int flags, ObjectId window, ComponentId radio_button, _Optional int *state, _Optional ComponentId *selected, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_optionbutton_set_state(unsigned int flags, ObjectId window, ComponentId option_button, int state, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_optionbutton_set_state(unsigned int flags, ObjectId window, ComponentId option_button, int state, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_optionbutton_get_state(unsigned int flags, ObjectId window, ComponentId option_button, int *state, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_optionbutton_get_state(unsigned int flags, ObjectId window, ComponentId option_button, _Optional int *state, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_set_title(unsigned int flags, ObjectId window, char *title, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_set_title(unsigned int flags, ObjectId window, char *title, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_set_extent(unsigned int flags, ObjectId window, BBox *extent, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_set_extent(unsigned int flags, ObjectId window, BBox *extent, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_get_extent(unsigned int flags, ObjectId window, BBox *extent, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_get_extent(unsigned int flags, ObjectId window, BBox *extent, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_set_pointer(unsigned int flags, ObjectId window, char *sprite_name, int x_hot_spot, int y_hot_spot, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_set_pointer(unsigned int flags, ObjectId window, _Optional char *sprite_name, int x_hot_spot, int y_hot_spot, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_get_wimp_handle(unsigned int flags, ObjectId window, int *window_handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_get_wimp_handle(unsigned int flags, ObjectId window, _Optional int *window_handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_get_tool_bars(unsigned int flags, ObjectId window, ObjectId *ibl, ObjectId *itl, ObjectId *ebl, ObjectId *etl, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_get_tool_bars(unsigned int flags, ObjectId window, _Optional ObjectId *ibl, _Optional ObjectId *itl, _Optional ObjectId *ebl, _Optional ObjectId *etl, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_get_pointer_info(unsigned int flags, int *x_pos, int *y_pos, int *buttons, ObjectId *window, ComponentId *component, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_get_pointer_info(unsigned int flags, _Optional int *x_pos, _Optional int *y_pos, _Optional int *buttons, _Optional ObjectId *window, _Optional ComponentId *component, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_window_force_redraw(unsigned int flags, ObjectId window, BBox *redraw_box, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_window_force_redraw(unsigned int flags, ObjectId window, BBox *redraw_box, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_actionbutton_set_text(unsigned int flags, ObjectId window, ComponentId action_button, char *text, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_actionbutton_set_text(unsigned int flags, ObjectId window, ComponentId action_button, char *text, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_gadget_set_help_message(unsigned int flags, ObjectId window, ComponentId gadget, char *message_text, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_gadget_set_help_message(unsigned int flags, ObjectId window, ComponentId gadget, char *message_text, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_gadget_set_focus (unsigned int flags, ObjectId window, ComponentId component, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_gadget_set_focus (unsigned int flags, ObjectId window, ComponentId component, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_gadget_get_bbox(unsigned int flags, ObjectId window, ComponentId gadget, BBox *bbox, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_gadget_get_bbox(unsigned int flags, ObjectId window, ComponentId gadget, BBox *bbox, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_button_set_value(unsigned int flags, ObjectId window, ComponentId button, char *value, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_button_set_value(unsigned int flags, ObjectId window, ComponentId button, char *value, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_button_get_value(unsigned int flags, ObjectId window, ComponentId button, char *buffer, int buff_size, int *nbytes, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_button_get_value(unsigned int flags, ObjectId window, ComponentId button, char *buffer, int buff_size, _Optional int *nbytes, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_button_set_validation(unsigned int flags, ObjectId window, ComponentId button, char *value, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_button_set_validation(unsigned int flags, ObjectId window, ComponentId button, char *value, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_numberrange_set_value(unsigned int flags, ObjectId window, ComponentId number_range, int value, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_numberrange_set_value(unsigned int flags, ObjectId window, ComponentId number_range, int value, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_numberrange_get_value(unsigned int flags, ObjectId window, ComponentId number_range, int *value, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_numberrange_get_value(unsigned int flags, ObjectId window, ComponentId number_range, _Optional int *value, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_slider_set_value(unsigned int flags, ObjectId window, ComponentId slider, int value, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_slider_set_value(unsigned int flags, ObjectId window, ComponentId slider, int value, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_slider_set_colour(unsigned int flags, ObjectId window, ComponentId slider, int bar_colour, int back_colour, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_slider_set_colour(unsigned int flags, ObjectId window, ComponentId slider, int bar_colour, int back_colour, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_set_tick(unsigned int flags, ObjectId menu, ComponentId entry, int tick, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_set_tick(unsigned int flags, ObjectId menu, ComponentId entry, int tick, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_get_tick(unsigned int flags, ObjectId menu, ComponentId entry, int *tick, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_get_tick(unsigned int flags, ObjectId menu, ComponentId entry, _Optional int *tick, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_set_fade(unsigned int flags, ObjectId menu, ComponentId entry, int tick, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_set_fade(unsigned int flags, ObjectId menu, ComponentId entry, int tick, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_get_fade(unsigned int flags, ObjectId menu, ComponentId entry, int *tick, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_get_fade(unsigned int flags, ObjectId menu, ComponentId entry, _Optional int *tick, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_add_entry(unsigned int flags, ObjectId menu, ComponentId at_entry, char *entry_description, ComponentId *new_entry, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_add_entry(unsigned int flags, ObjectId menu, ComponentId at_entry, char *entry_description, _Optional ComponentId *new_entry, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_menu_set_entry_text(unsigned int flags, ObjectId menu, ComponentId entry, char *text, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_menu_set_entry_text(unsigned int flags, ObjectId menu, ComponentId entry, char *text, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_quit_set_message(unsigned int flags, ObjectId quit, char *message, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_quit_set_message(unsigned int flags, ObjectId quit, char *message, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_quit_get_window_id(unsigned int flags, ObjectId quit, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_quit_get_window_id(unsigned int flags, ObjectId quit, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_colourdbox_get_wimp_handle(unsigned int flags, ObjectId colourdbox, int *wimp_handle, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_colourdbox_get_wimp_handle(unsigned int flags, ObjectId colourdbox, _Optional int *wimp_handle, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_fileinfo_get_window_id(unsigned int flags, ObjectId fileinfo, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_fileinfo_get_window_id(unsigned int flags, ObjectId fileinfo, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_proginfo_get_window_id(unsigned int flags, ObjectId proginfo, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_proginfo_get_window_id(unsigned int flags, ObjectId proginfo, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_scale_get_window_id(unsigned int flags, ObjectId scale, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_scale_get_window_id(unsigned int flags, ObjectId scale, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_fontdbox_get_window_id(unsigned int flags, ObjectId fontdbox, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_fontdbox_get_window_id(unsigned int flags, ObjectId fontdbox, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_dcs_get_window_id(unsigned int flags, ObjectId dcs, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_dcs_get_window_id(unsigned int flags, ObjectId dcs, _Optional ObjectId *window, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_printdbox_get_window_id(unsigned int flags, ObjectId printdbox, ObjectId *window, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_printdbox_get_window_id(unsigned int flags, ObjectId printdbox, _Optional ObjectId *window, const char *file, unsigned long line);
 
 /* The following functions are for use in unit tests */
 
@@ -398,7 +404,10 @@ void pseudo_saveas_reset_file_save_completed(void);
     * subsequently sent via saveas_file_save_completed.
     */
 
-ObjectId pseudo_saveas_get_file_save_completed(unsigned int *flags, char *buffer, int buff_size, int *nbytes);
+ObjectId pseudo_saveas_get_file_save_completed(_Optional unsigned int *flags,
+                                               _Optional char *buffer,
+                                               int buff_size,
+                                               _Optional int *nbytes);
    /*
     * Gets the parameter values passed by the last caller of
     * saveas_file_save_completed.
@@ -414,7 +423,10 @@ void pseudo_saveas_reset_buffer_filled(void);
     * subsequently sent via saveas_buffer_filled.
     */
 
-ObjectId pseudo_saveas_get_buffer_filled(unsigned int *flags, void *buffer, int buff_size, int *nbytes);
+ObjectId pseudo_saveas_get_buffer_filled(_Optional unsigned int *flags,
+                                         _Optional void *buffer,
+                                         int buff_size,
+                                         _Optional int *nbytes);
    /*
     * Gets the parameter values passed by the last caller of
     * saveas_buffer_filled.

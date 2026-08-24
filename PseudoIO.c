@@ -24,6 +24,8 @@
   CJB: 09-Dec-16: Added interceptor versions of fgetc and fputc.
   CJB: 13-Jun-20: Use new Fortify_AllowAllocate to avoid accumulating huge
                   numbers of 'freed' dummy memory allocations.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
 */
 
 #undef FORTIFY /* Prevent macro redirection of IO function calls to
@@ -33,12 +35,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <stdbool.h>
 
 /* Local headers */
 #include "Debug.h"
-#include "Internal/CBDebMisc.h"
 #include "PseudoIO.h"
-#include "LinkedList.h"
+#include "Internal/CBDebMisc.h"
 
 #include "fortify.h"
 
@@ -49,9 +51,9 @@ static bool io_succeeds(const char *file, unsigned long line)
   return Fortify_AllowAllocate(file, line);
 }
 
-FILE *pseudo_fopen(const char *filename, const char *mode, const char *file, unsigned long line)
+_Optional FILE *pseudo_fopen(const char *filename, const char *mode, const char *file, unsigned long line)
 {
-  FILE *fh;
+  _Optional FILE *fh;
   assert(filename);
   assert(mode);
   if (io_succeeds(file, line))

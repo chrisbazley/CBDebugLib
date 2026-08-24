@@ -28,6 +28,9 @@ Message tokens: None.
 History:
   CJB: 27-Jan-08: Created.
   CJB: 11-Dec-20: Removed redundant uses of the 'extern' keyword.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
+
 */
 
 #ifndef PseudoFlex_h
@@ -35,6 +38,10 @@ History:
 
 /* Acorn C/C++ library headers */
 #include <flex.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 #ifdef FORTIFY
 
@@ -92,7 +99,7 @@ int PseudoFlex_reanchor(flex_ptr to, flex_ptr from);
 
 int PseudoFlex_set_budge(int newstate);
 
-void PseudoFlex_init(char *program_name, int *error_fd, int dynamic_size);
+void PseudoFlex_init(char *program_name, _Optional int *error_fd, int dynamic_size);
 
 void PseudoFlex_save_heap_info(char *filename);
 

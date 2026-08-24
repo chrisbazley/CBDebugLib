@@ -302,7 +302,7 @@ void debug_vprintf(const char *format, va_list arg)
       readp = formatted;
       while (*readp != '\0')
       {
-        char   *eol;
+        _Optional char *eol;
         size_t  len, copied;
 
         /* Search for the next line feed in the string to be output */

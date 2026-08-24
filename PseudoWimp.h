@@ -34,6 +34,9 @@ History:
   CJB: 31-Jan-16: Intercepted wimp_set_colour to allow error simulation.
   CJB: 02-Aug-26: Explicitly allow output arguments of pseudo_wimp_get_message2
                   to be null.
+  CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
+
 */
 
 #ifndef PseudoWimp_h
@@ -42,6 +45,10 @@ History:
 /* Acorn C/C++ library headers */
 #include <kernel.h>
 #include <wimplib.h>
+
+#if !defined(USE_OPTIONAL) && !defined(_Optional)
+#define _Optional
+#endif
 
 #ifdef FORTIFY
 
@@ -81,25 +88,25 @@ History:
 
 #endif
 
-_kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_get_window_state(WimpGetWindowStateBlock *state, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_get_window_state(WimpGetWindowStateBlock *state, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_get_caret_position(WimpGetCaretPositionBlock *block, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_get_caret_position(WimpGetCaretPositionBlock *block, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_send_message(int code, void *block, int handle, int icon, int *th, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_send_message(int code, void *block, int handle, int icon, _Optional int *th, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_get_pointer_info(WimpGetPointerInfoBlock *block, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_get_pointer_info(WimpGetPointerInfoBlock *block, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh, void *dbuf, int size, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh, void *dbuf, int size, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_drag_box(WimpDragBox *block, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_drag_box(_Optional WimpDragBox *block, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line);
 
-_kernel_oserror *pseudo_wimp_set_colour(int colour, const char *file, unsigned long line);
+_Optional _kernel_oserror *pseudo_wimp_set_colour(int colour, const char *file, unsigned long line);
 
 /* The following functions are for use in unit tests */
 

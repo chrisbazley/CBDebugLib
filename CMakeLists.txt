@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
 project(CBDebugLib C)
 
-include(FetchContent)
-
-FetchContent_Declare(OptionalAcornC GIT_REPOSITORY https://github.com/chrisbazley/OptionalAcornC.git GIT_TAG main)
-
-FetchContent_MakeAvailable(OptionalAcornC)
-
 option(USE_OPTIONAL "Enable the _Optional qualifier" OFF)
+option(USE_FORTIFY "Enable pseudo interfaces and Fortify fault injection" OFF)
 option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
+
+if(USE_FORTIFY)
+  include(FetchContent)
+  FetchContent_Declare(OptionalAcornC GIT_REPOSITORY https://github.com/chrisbazley/OptionalAcornC.git GIT_TAG main)
+  FetchContent_Declare(CBUtil GIT_REPOSITORY https://github.com/chrisbazley/CBUtilLib.git GIT_TAG main)
+  FetchContent_Declare(Fortify GIT_REPOSITORY https://github.com/chrisbazley/Fortify.git GIT_TAG main)
+  FetchContent_MakeAvailable(OptionalAcornC CBUtil Fortify)
+endif()
 
 if(USE_OPTIONAL)
     if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang|AppleClang")
@@ -61,9 +64,20 @@ if(ENABLE_CLANG_TIDY)
     message(STATUS "_Optional static analysis enabled")
 endif()
 
-# Until Fortify builds are supported here
-set(SOURCES Debug.c)
-file(GLOB PUBLIC_HEADERS "*.h")
+file(GLOB SOURCES CONFIGURE_DEPENDS "*.c")
+file(GLOB PUBLIC_HEADERS CONFIGURE_DEPENDS "*.h")
+
+file(GLOB FORTIFY_SOURCES CONFIGURE_DEPENDS "Pseudo*.c")
+file(GLOB FORTIFY_HEADERS CONFIGURE_DEPENDS "Pseudo*.h")
+
+list(REMOVE_ITEM SOURCES ${FORTIFY_SOURCES})
+list(REMOVE_ITEM PUBLIC_HEADERS ${FORTIFY_HEADERS})
+
+if(USE_FORTIFY)
+    list(APPEND SOURCES ${FORTIFY_SOURCES})
+    list(APPEND PUBLIC_HEADERS ${FORTIFY_HEADERS})
+endif()
+
 file(GLOB PRIVATE_HEADERS "Internal/*.h")
 
 add_library(CBDebug STATIC ${SOURCES} ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
@@ -79,9 +93,13 @@ target_compile_definitions(CBDebug PRIVATE
     $<$<CONFIG:Debug>:DEBUG_OUTPUT>
 )
 
-target_link_libraries(CBDebug PRIVATE
-    OptionalAcornC
-)
+if(USE_FORTIFY)
+  target_link_libraries(CBDebug PRIVATE
+      OptionalAcornC
+      Fortify
+      CBUtil
+  )
+endif()
 
 install(TARGETS CBDebug
     ARCHIVE DESTINATION lib

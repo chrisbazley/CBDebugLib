@@ -55,6 +55,8 @@
                   continued the loop), and assert that the pointer argument
                   is not null.
                   Assert that null is not passed to pseudo_wimp_read_sys_info.
+                  Use the _Optional qualifier for referenced types where
+                  the pointer can be null.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -92,9 +94,9 @@ static struct
 }
 msgs[32];
 
-_kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(results);
   if (e == NULL)
@@ -103,9 +105,9 @@ _kernel_oserror *pseudo_wimp_read_sys_info(int reason, WimpSysInfo *results, con
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_get_window_state(WimpGetWindowStateBlock *state, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_get_window_state(WimpGetWindowStateBlock *state, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(state);
   if (e == NULL)
@@ -114,9 +116,9 @@ _kernel_oserror *pseudo_wimp_get_window_state(WimpGetWindowStateBlock *state, co
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_get_caret_position(WimpGetCaretPositionBlock *block, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_get_caret_position(WimpGetCaretPositionBlock *block, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
   if (e == NULL)
@@ -180,11 +182,11 @@ void pseudo_wimp_get_message2(unsigned int index, _Optional int *code,
     *icon = msgs[index].icon;
 }
 
-_kernel_oserror *pseudo_wimp_send_message(int code, void *block, int handle, int icon, int *th, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_send_message(int code, void *block, int handle, int icon, _Optional int *th, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
-  assert(code == Wimp_ENull || block != NULL);
+  assert(block != NULL);
   /* th can be NULL */
   if (e == NULL)
   {
@@ -269,10 +271,10 @@ void pseudo_wimp_set_pointer_info(const WimpGetPointerInfoBlock *block)
   fake_pointer_info = *block;
 }
 
-_kernel_oserror *pseudo_wimp_get_pointer_info(WimpGetPointerInfoBlock *block, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_get_pointer_info(WimpGetPointerInfoBlock *block, const char *file, unsigned long line)
 {
   DEBUGF("wimp_get_pointer_info called at %s:%lu\n", file, line);
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
   if (e == NULL)
@@ -286,10 +288,10 @@ _kernel_oserror *pseudo_wimp_get_pointer_info(WimpGetPointerInfoBlock *block, co
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh, void *dbuf, int size, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh, void *dbuf, int size, const char *file, unsigned long line)
 {
   DEBUGF("wimp_transfer_block called at %s:%lu\n", file, line);
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(sbuf);
   assert(dbuf);
@@ -308,7 +310,7 @@ _kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh, void *db
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_drag_box(WimpDragBox *block, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_drag_box(_Optional WimpDragBox *block, const char *file, unsigned long line)
 {
   DEBUGF("wimp_drag_box called at %s:%lu with %p\n", file, line, (void *)block);
   if ((int)block > 0) {
@@ -320,7 +322,7 @@ _kernel_oserror *pseudo_wimp_drag_box(WimpDragBox *block, const char *file, unsi
            block->dragging_box.xmin, block->dragging_box.ymin, block->dragging_box.xmax, block->dragging_box.ymax,
            block->parent_box.xmin, block->parent_box.ymin, block->parent_box.xmax, block->parent_box.ymax);
   }
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   if (e == NULL)
     e = wimp_drag_box(block);
@@ -328,9 +330,9 @@ _kernel_oserror *pseudo_wimp_drag_box(WimpDragBox *block, const char *file, unsi
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
   assert(more);
@@ -342,7 +344,7 @@ _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *mo
   {
     /* We actually do need to handle redraw, or the window manager gets pissed off. */
     WimpRedrawWindowBlock b;
-    _kernel_oserror *e2;
+    _Optional _kernel_oserror *e2;
 
     b.window_handle = block->window_handle;
     for (e2 = wimp_redraw_window(&b, more);
@@ -356,9 +358,9 @@ _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *block, int *mo
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *more, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
 
   assert(block);
   assert(more);
@@ -370,7 +372,7 @@ _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *mo
   {
     /* We actually do need to handle redraw, or the window manager gets pissed off. */
     WimpRedrawWindowBlock b;
-    _kernel_oserror *e2;
+    _Optional _kernel_oserror *e2;
 
     b.window_handle = block->window_handle;
     for (e2 = wimp_get_rectangle(&b, more);
@@ -384,9 +386,9 @@ _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *block, int *mo
   return e;
 }
 
-_kernel_oserror *pseudo_wimp_set_colour(int colour, const char *file, unsigned long line)
+_Optional _kernel_oserror *pseudo_wimp_set_colour(int colour, const char *file, unsigned long line)
 {
-  _kernel_oserror *e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
   if (e == NULL)
   {
     e = wimp_set_colour(colour);
