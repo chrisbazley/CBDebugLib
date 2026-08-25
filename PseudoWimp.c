@@ -58,6 +58,8 @@
                   Use the _Optional qualifier for referenced types where
                   the pointer can be null.
   CJB: 25-Aug-26: Cast WimpDragBox pointer to intptr_t instead of int.
+                  Change the type of msg_count to match
+                  pseudo_wimp_get_message_count.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -86,7 +88,7 @@ enum
 };
 
 static bool capture;
-static size_t msg_count;
+static unsigned int msg_count;
 static struct
 {
   int code;
@@ -138,7 +140,7 @@ void pseudo_wimp_reset(void)
 
 unsigned int pseudo_wimp_get_message_count(void)
 {
-  DEBUGF("%zu Wimp messages have been recorded\n", msg_count);
+  DEBUGF("%u Wimp messages have been recorded\n", msg_count);
   return msg_count;
 }
 
@@ -146,7 +148,7 @@ void pseudo_wimp_get_message(unsigned int index, WimpMessage *msg)
 {
   assert(index < msg_count);
 
-  DEBUGF("Wimp message %u of %zu {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} queried\n",
+  DEBUGF("Wimp message %u of %u {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} queried\n",
          index+1, msg_count,
          msgs[index].block.words[0],
          msgs[index].block.words[1],
@@ -165,7 +167,7 @@ void pseudo_wimp_get_message2(unsigned int index, _Optional int *code,
 {
   assert(index < msg_count);
 
-  DEBUGF("Wimp message %u of %zu {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} queried\n",
+  DEBUGF("Wimp message %u of %u {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} queried\n",
          index+1, msg_count,
          msgs[index].block.words[0],
          msgs[index].block.words[1],
@@ -212,7 +214,7 @@ _Optional _kernel_oserror *pseudo_wimp_send_message(int code, void *block, int h
         WimpSysInfo info;
         e =  wimp_read_sys_info(TaskHandleAndVersion, &info);
         assert(e == NULL);
-        ((WimpMessage *)block)->hdr.sender = info.r0;
+        ((WimpMessage *)block)->hdr.sender = (int)info.r0;
         ((WimpMessage *)block)->hdr.my_ref = ++my_ref;
       }
 
@@ -244,7 +246,7 @@ _Optional _kernel_oserror *pseudo_wimp_send_message(int code, void *block, int h
         msgs[msg_count].block = *(const WimpPollBlock *)block;
         msgs[msg_count].handle = handle;
         msgs[msg_count].icon = icon;
-        DEBUGF("Wimp message %zu {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} recorded\n",
+        DEBUGF("Wimp message %u {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x} recorded\n",
                msg_count+1,
                msgs[msg_count].block.words[0],
                msgs[msg_count].block.words[1],
