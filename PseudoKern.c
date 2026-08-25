@@ -34,12 +34,12 @@
 #include "kernel.h"
 #include "swis.h"
 
+#include "fortify.h"
+
 /* Local headers */
 #include "PseudoKern.h"
 #include "Internal/CBDebMisc.h"
 #include "Debug.h"
-
-#include "fortify.h"
 
 _kernel_oserror *pseudokern_fail(const char *file, unsigned long line)
 {
