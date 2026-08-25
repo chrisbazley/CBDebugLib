@@ -36,12 +36,14 @@
                   null is passed instead of an event_code address.
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
                   pseudo_event_... functions within this source file. */
 
 /* ISO library headers */
+#include <stdint.h>
 #include <stdbool.h>
 
 /* Acorn C/C++ library headers */
@@ -101,7 +103,7 @@ static _Optional _kernel_oserror *oom(void)
   static const _kernel_oserror temp = {DUMMY_ERRNO, "NoMem"};
   _kernel_swi_regs regs;
 
-  regs.r[0] = (int)&temp;
+  regs.r[0] = (intptr_t)&temp;
   regs.r[1] = 0; /* use global messages */
   regs.r[2] = 0; /* use an internal buffer */
   regs.r[3] = 0; /* buffer size */

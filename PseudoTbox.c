@@ -47,6 +47,7 @@
                   debug output is disabled at compile time.
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
 
 */
 
@@ -57,6 +58,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /* Acorn C/C++ library headers */
 #include "kernel.h"
@@ -265,7 +267,7 @@ _Optional _kernel_oserror *pseudo_toolbox_create_object(unsigned int flags, void
 
     DEBUGF("PseudoTbox: Not enough memory to create record of object\n");
 
-    regs.r[0] = (int)&temp;
+    regs.r[0] = (intptr_t)&temp;
     regs.r[1] = 0; /* use global messages */
     regs.r[2] = 0; /* use an internal buffer */
     regs.r[3] = 0; /* buffer size */

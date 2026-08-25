@@ -57,6 +57,7 @@
                   Assert that null is not passed to pseudo_wimp_read_sys_info.
                   Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Cast WimpDragBox pointer to intptr_t instead of int.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -67,6 +68,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /* Acorn C/C++ library headers */
 #include "kernel.h"
@@ -313,8 +315,7 @@ _Optional _kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh
 _Optional _kernel_oserror *pseudo_wimp_drag_box(_Optional WimpDragBox *block, const char *file, unsigned long line)
 {
   DEBUGF("wimp_drag_box called at %s:%lu with %p\n", file, line, (void *)block);
-  if ((int)block > 0) {
-    assert(block);
+  if (block && (intptr_t)block != -1) {
     DEBUGF("wimp_window: %d drag_type: %d\n"
            "dragging_box: {%d,%d,%d,%d}\n"
            "parent_box: {%d,%d,%d,%d}\n",
