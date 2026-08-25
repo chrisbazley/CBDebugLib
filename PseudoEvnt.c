@@ -52,6 +52,8 @@
 #include "swis.h"
 #include "wimplib.h"
 
+#include "fortify.h"
+
 #include "LinkedList.h"
 
 /* Local headers */
@@ -60,8 +62,6 @@
 #include "PseudoKern.h"
 #include "PseudoTbox.h"
 #include "Internal/CBDebMisc.h"
-
-#include "Fortify.h"
 
 /* These lists of event handlers are currently used only to detect leaks */
 static LinkedList wimp_handlers, tb_handlers, msg_handlers;

@@ -59,14 +59,14 @@
 /* Acorn C/C++ library headers */
 #include "flex.h"
 
+#include "fortify.h"
+
 #include "LinkedList.h"
 
 /* Local headers */
 #include "PseudoFlex.h"
 #include "Debug.h"
 #include "Internal/CBDebMisc.h"
-
-#include "Fortify.h"
 
 /* -----------------------------------------------------------------------
                           Internal library data
