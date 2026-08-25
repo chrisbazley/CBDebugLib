@@ -47,6 +47,8 @@
                   debug output is disabled at compile time.
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Initialize dynamically allocated object records by
+                  assigning compound literals.
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
 
 */
@@ -195,8 +197,7 @@ void pseudo_toolbox_object_created(ObjectId id)
   DEBUGF("PseudoTbox: Object 0x%x was auto-created\n", id);
   if (record != NULL)
   {
-    record->object_id = id;
-    record->is_showing = false;
+    *record = (PseudoTbox_Object){{NULL, NULL}, id, false};
     linkedlist_insert(&objects, NULL, &record->list_item);
   }
   else
@@ -252,7 +253,8 @@ _Optional _kernel_oserror *pseudo_toolbox_create_object(unsigned int flags, void
 
     if (e == NULL)
     {
-      record->is_showing = false;
+      *record = (PseudoTbox_Object){
+        {NULL, NULL}, record->object_id, false};
       linkedlist_insert(&objects, NULL, &record->list_item);
     }
     else

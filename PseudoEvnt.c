@@ -37,6 +37,8 @@
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
+  CJB: 25-Aug-26: Initialize dynamically allocated handler records by
+                  assigning compound literals.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -286,10 +288,8 @@ _Optional _kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object
   record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
-    record->object_id = object_id;
-    record->event_code = event_code;
-    record->handler = handler;
-    record->handle = handle;
+    *record = (PseudoEvent_Toolbox_Handler){
+      {NULL, NULL}, object_id, event_code, handler, handle};
 
     e = event_register_toolbox_handler(object_id, event_code, handler, handle);
     if (e == NULL)
@@ -383,9 +383,8 @@ _Optional _kernel_oserror *pseudo_event_register_message_handler(int msg_no, Wim
   record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
-    record->msg_no = msg_no;
-    record->handler = handler;
-    record->handle = handle;
+    *record = (PseudoEvent_Message_Handler){
+      {NULL, NULL}, msg_no, handler, handle};
 
     e = event_register_message_handler(msg_no, handler, handle);
     if (e == NULL)
@@ -448,10 +447,8 @@ _Optional _kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id
   record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
-    record->object_id = object_id;
-    record->event_code = event_code;
-    record->handler = handler;
-    record->handle = handle;
+    *record = (PseudoEvent_Wimp_Handler){
+      {NULL, NULL}, object_id, event_code, handler, handle};
 
     e = event_register_wimp_handler(object_id, event_code, handler, handle);
     if (e == NULL)

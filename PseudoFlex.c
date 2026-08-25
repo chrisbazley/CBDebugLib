@@ -49,6 +49,8 @@
                   debug output is disabled at compile time.
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Initialize dynamically allocated records by assigning
+                  compound literals.
 
 */
 
@@ -120,8 +122,7 @@ int PseudoFlex_alloc(flex_ptr anchor, int n, const char *file, unsigned long lin
   }
 
   /* Store the address of the anchor and the size of the block. */
-  pfr->anchor = anchor;
-  pfr->size = n;
+  *pfr = (PseudoFlexRecord){{NULL, NULL}, n, anchor};
 
   /* Link our record of the new block at the head of a double-linked list */
   linkedlist_insert(&block_list, NULL, &pfr->list_item);
