@@ -20,10 +20,14 @@
 /* History:
   CJB: 11-Apr-25: Dogfooding the _Optional qualifier.
   CJB: 25-Aug-26: Add a definition of CONTAINER_OF.
+  CJB: 25-Aug-26: Include the header that declares offsetof, on which
+                  CONTAINER_OF depends.
 */
 
 #ifndef CBDebMisc_h
 #define CBDebMisc_h
+
+#include <stddef.h>
 
 #ifdef USE_OPTIONAL
 #include <stdio.h>

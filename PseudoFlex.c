@@ -51,6 +51,8 @@
                   the pointer can be null.
   CJB: 25-Aug-26: Initialize dynamically allocated records by assigning
                   compound literals.
+  CJB: 25-Aug-26: Use CONTAINER_OF to recover flex records from their
+                  linked-list items.
 
 */
 
@@ -407,7 +409,8 @@ int PseudoFlex_set_deferred_compaction(int newstate)
 static bool block_has_anchor(LinkedList *list, LinkedListItem *item, void *arg)
 {
   const flex_ptr anchor = arg;
-  const PseudoFlexRecord * const pfr = (PseudoFlexRecord *)item;
+  const PseudoFlexRecord *const pfr =
+    CONTAINER_OF(item, PseudoFlexRecord, list_item);
 
   assert(pfr != NULL);
   assert(anchor != NULL);
@@ -429,7 +432,7 @@ static _Optional PseudoFlexRecord *find_anchor(flex_ptr anchor)
   }
 
   PseudoFlexRecord *const pfr =
-      CONTAINER_OF(item, PseudoFlexRecord, list_item);
+      CONTAINER_OF(&*item, PseudoFlexRecord, list_item);
   DEBUG_VERBOSE("PseudoFlex: Anchor %p found in record %p",
                 (void *)anchor, (void *)pfr);
 

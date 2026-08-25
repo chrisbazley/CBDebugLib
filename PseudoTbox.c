@@ -49,6 +49,8 @@
                   the pointer can be null.
   CJB: 25-Aug-26: Initialize dynamically allocated object records by
                   assigning compound literals.
+  CJB: 25-Aug-26: Use CONTAINER_OF to recover object records from their
+                  linked-list items.
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
 
 */
@@ -101,7 +103,8 @@ PseudoTbox_Object;
 
 static bool reset_object_record(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  PseudoTbox_Object * const record = (PseudoTbox_Object *)item;
+  PseudoTbox_Object *const record =
+    CONTAINER_OF(item, PseudoTbox_Object, list_item);
 
   assert(list == &objects);
   NOT_USED(arg);
@@ -145,7 +148,8 @@ _Optional _kernel_oserror *pseudo_toolbox_initialise( unsigned int flags,
 
 static bool template_name_matches(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoTbox_Object * const record = (PseudoTbox_Object *)item;
+  const PseudoTbox_Object *const record =
+    CONTAINER_OF(item, PseudoTbox_Object, list_item);
   const char *template_name = arg;
   char buffer[256];
   int nbytes;
@@ -185,7 +189,7 @@ ObjectId pseudo_toolbox_find_by_template_name(char *template_name)
   }
   else
   {
-    id = ((PseudoTbox_Object *)item)->object_id;
+    id = CONTAINER_OF(&*item, PseudoTbox_Object, list_item)->object_id;
   }
   return id;
 }
@@ -208,7 +212,8 @@ void pseudo_toolbox_object_created(ObjectId id)
 
 static bool object_id_matches(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoTbox_Object * const record = (PseudoTbox_Object *)item;
+  const PseudoTbox_Object *const record =
+    CONTAINER_OF(item, PseudoTbox_Object, list_item);
   const ObjectId * const id = arg;
 
   assert(list == &objects);
@@ -302,7 +307,7 @@ _Optional _kernel_oserror *pseudo_toolbox_show_object(unsigned int flags, Object
     if (item != NULL)
     {
       PseudoTbox_Object *const record =
-          CONTAINER_OF(item, PseudoTbox_Object, list_item);
+          CONTAINER_OF(&*item, PseudoTbox_Object, list_item);
       record->is_showing = true;
     }
 
@@ -327,7 +332,7 @@ _Optional _kernel_oserror *pseudo_toolbox_hide_object(unsigned int flags, Object
     if (item != NULL)
     {
       PseudoTbox_Object *const record =
-          CONTAINER_OF(item, PseudoTbox_Object, list_item);
+          CONTAINER_OF(&*item, PseudoTbox_Object, list_item);
       record->is_showing = false;
     }
 
@@ -349,7 +354,7 @@ bool pseudo_toolbox_object_is_showing(ObjectId id)
   if (item != NULL)
   {
     const PseudoTbox_Object *const record =
-        CONTAINER_OF(item, PseudoTbox_Object, list_item);
+        CONTAINER_OF(&*item, PseudoTbox_Object, list_item);
     is_showing = record->is_showing;
   }
 

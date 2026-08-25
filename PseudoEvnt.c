@@ -39,6 +39,8 @@
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
   CJB: 25-Aug-26: Initialize dynamically allocated handler records by
                   assigning compound literals.
+  CJB: 25-Aug-26: Use CONTAINER_OF to recover handler records from their
+                  linked-list items.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -312,7 +314,8 @@ _Optional _kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object
 
 static bool toolbox_handler_matches(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoEvent_Toolbox_Handler * const record = (PseudoEvent_Toolbox_Handler *)item;
+  const PseudoEvent_Toolbox_Handler *const record =
+    CONTAINER_OF(item, PseudoEvent_Toolbox_Handler, list_item);
   const PseudoEvent_Toolbox_Handler * const to_match = arg;
 
   assert(list == &tb_handlers);
@@ -339,14 +342,16 @@ _Optional _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId obje
   item = linkedlist_for_each(&tb_handlers, toolbox_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&tb_handlers, &*item);
-  Fortify_free(item, file, line);
+  Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Toolbox_Handler, list_item),
+               file, line);
 
   return event_deregister_toolbox_handler(object_id, event_code, handler, handle);
 }
 
 static bool deregister_toolbox_handlers_for_object(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoEvent_Toolbox_Handler * const record = (PseudoEvent_Toolbox_Handler *)item;
+  PseudoEvent_Toolbox_Handler *const record =
+    CONTAINER_OF(item, PseudoEvent_Toolbox_Handler, list_item);
   const int * const object_id = arg;
 
   assert(list == &tb_handlers);
@@ -355,7 +360,7 @@ static bool deregister_toolbox_handlers_for_object(LinkedList *list, LinkedListI
   if (*object_id == record->object_id)
   {
     linkedlist_remove(list, item);
-    Fortify_free(item, __FILE__, __LINE__);
+    Fortify_free(record, __FILE__, __LINE__);
   }
 
   return false; /* next list item */
@@ -407,7 +412,8 @@ _Optional _kernel_oserror *pseudo_event_register_message_handler(int msg_no, Wim
 
 static bool message_handler_matches(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoEvent_Message_Handler * const record = (PseudoEvent_Message_Handler *)item;
+  const PseudoEvent_Message_Handler *const record =
+    CONTAINER_OF(item, PseudoEvent_Message_Handler, list_item);
   const PseudoEvent_Message_Handler * const to_match = arg;
 
   assert(list == &msg_handlers);
@@ -432,7 +438,8 @@ _Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, W
   item = linkedlist_for_each(&msg_handlers, message_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&msg_handlers, &*item);
-  Fortify_free(item, file, line);
+  Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Message_Handler, list_item),
+               file, line);
 
   return event_deregister_message_handler(msg_no, handler, handle);
 }
@@ -471,7 +478,8 @@ _Optional _kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id
 
 static bool wimp_handler_matches(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoEvent_Wimp_Handler * const record = (PseudoEvent_Wimp_Handler *)item;
+  const PseudoEvent_Wimp_Handler *const record =
+    CONTAINER_OF(item, PseudoEvent_Wimp_Handler, list_item);
   const PseudoEvent_Wimp_Handler * const to_match = arg;
 
   assert(list == &wimp_handlers);
@@ -498,14 +506,16 @@ _Optional _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_
   item = linkedlist_for_each(&wimp_handlers, wimp_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&wimp_handlers, &*item);
-  Fortify_free(item, file, line);
+  Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Wimp_Handler, list_item),
+               file, line);
 
   return event_deregister_wimp_handler(object_id, event_code, handler, handle);
 }
 
 static bool deregister_wimp_handlers_for_object(LinkedList *list, LinkedListItem *item, void *arg)
 {
-  const PseudoEvent_Wimp_Handler * const record = (PseudoEvent_Wimp_Handler *)item;
+  PseudoEvent_Wimp_Handler *const record =
+    CONTAINER_OF(item, PseudoEvent_Wimp_Handler, list_item);
   const int * const object_id = arg;
 
   assert(list == &wimp_handlers);
@@ -514,7 +524,7 @@ static bool deregister_wimp_handlers_for_object(LinkedList *list, LinkedListItem
   if (*object_id == record->object_id)
   {
     linkedlist_remove(list, item);
-    Fortify_free(item, __FILE__, __LINE__);
+    Fortify_free(record, __FILE__, __LINE__);
   }
 
   return false; /* next list item */
