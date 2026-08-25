@@ -60,6 +60,7 @@
   CJB: 25-Aug-26: Cast WimpDragBox pointer to intptr_t instead of int.
                   Change the type of msg_count to match
                   pseudo_wimp_get_message_count.
+  CJB: 25-Aug-26: Initialize temporary redraw blocks in their declarations.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -346,10 +347,9 @@ _Optional _kernel_oserror *pseudo_wimp_redraw_window(WimpRedrawWindowBlock *bloc
   else
   {
     /* We actually do need to handle redraw, or the window manager gets pissed off. */
-    WimpRedrawWindowBlock b;
+    WimpRedrawWindowBlock b = {.window_handle = block->window_handle};
     _Optional _kernel_oserror *e2;
 
-    b.window_handle = block->window_handle;
     for (e2 = wimp_redraw_window(&b, more);
          e2 == NULL && *more;
          e2 = wimp_get_rectangle(&b, more))
@@ -374,10 +374,9 @@ _Optional _kernel_oserror *pseudo_wimp_get_rectangle(WimpRedrawWindowBlock *bloc
   else
   {
     /* We actually do need to handle redraw, or the window manager gets pissed off. */
-    WimpRedrawWindowBlock b;
+    WimpRedrawWindowBlock b = {.window_handle = block->window_handle};
     _Optional _kernel_oserror *e2;
 
-    b.window_handle = block->window_handle;
     for (e2 = wimp_get_rectangle(&b, more);
          e2 == NULL && *more;
          e2 = wimp_get_rectangle(&b, more))

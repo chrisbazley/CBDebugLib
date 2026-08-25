@@ -41,6 +41,7 @@
                   assigning compound literals.
   CJB: 25-Aug-26: Use CONTAINER_OF to recover handler records from their
                   linked-list items.
+  CJB: 25-Aug-26: Initialize temporary objects in their declarations.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -229,7 +230,9 @@ _Optional _kernel_oserror *pseudo_event_wait_for_idle(void)
     else
     {
       WimpPollBlock poll_block;
-      int pollword;
+      /* The client's event mask may enable poll-word polling, in which case
+         wimp_poll requires the pointed-to value to be initialized. */
+      int pollword = 0;
       e = wimp_poll(mask & ~Wimp_Poll_NullMask, &poll_block, &pollword, &event_code);
       if (e != NULL)
       {
@@ -329,15 +332,11 @@ static bool toolbox_handler_matches(LinkedList *list, LinkedListItem *item, void
 
 _Optional _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  PseudoEvent_Toolbox_Handler to_match;
+  PseudoEvent_Toolbox_Handler to_match = {
+    {NULL, NULL}, object_id, event_code, handler, handle};
   _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_toolbox_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, (unsigned)object_id, file, line);
-
-  to_match.object_id = object_id;
-  to_match.event_code = event_code;
-  to_match.handler = handler;
-  to_match.handle = handle;
 
   item = linkedlist_for_each(&tb_handlers, toolbox_handler_matches, &to_match);
   assert(item != NULL);
@@ -426,14 +425,11 @@ static bool message_handler_matches(LinkedList *list, LinkedListItem *item, void
 
 _Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  PseudoEvent_Message_Handler to_match;
+  PseudoEvent_Message_Handler to_match = {
+    {NULL, NULL}, msg_no, handler, handle};
   _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_message_handler called for msg 0x%x at %s:%lu\n", msg_no, file, line);
-
-  to_match.msg_no = msg_no;
-  to_match.handler = handler;
-  to_match.handle = handle;
 
   item = linkedlist_for_each(&msg_handlers, message_handler_matches, &to_match);
   assert(item != NULL);
@@ -493,15 +489,11 @@ static bool wimp_handler_matches(LinkedList *list, LinkedListItem *item, void *a
 
 _Optional _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
-  PseudoEvent_Wimp_Handler to_match;
+  PseudoEvent_Wimp_Handler to_match = {
+    {NULL, NULL}, object_id, event_code, handler, handle};
   _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_wimp_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, object_id, file, line);
-
-  to_match.object_id = object_id;
-  to_match.event_code = event_code;
-  to_match.handler = handler;
-  to_match.handle = handle;
 
   item = linkedlist_for_each(&wimp_handlers, wimp_handler_matches, &to_match);
   assert(item != NULL);
