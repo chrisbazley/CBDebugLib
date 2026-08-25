@@ -31,6 +31,8 @@ History:
   CJB: 09-Dec-16: Added interceptor versions of fgetc and fputc.
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
+  CJB: 25-Aug-26: Added portable interception of ferror and clearerr. Intercept
+                  every ISO C function that opens a stream.
 */
 
 #ifndef PseudoIO_h
@@ -47,6 +49,12 @@ History:
 
 #define fopen(filename, mode) \
           pseudo_fopen(filename, mode, __FILE__, __LINE__)
+
+#define freopen(filename, mode, stream) \
+          pseudo_freopen(filename, mode, stream, __FILE__, __LINE__)
+
+#define tmpfile() \
+          pseudo_tmpfile(__FILE__, __LINE__)
 
 #define rewind(stream) \
           pseudo_rewind(stream, __FILE__, __LINE__)
@@ -80,9 +88,21 @@ History:
 #define fputc(c, stream) \
           pseudo_fputc(c, stream, __FILE__, __LINE__)
 
+#define ferror(stream) \
+          pseudo_ferror(stream)
+
+#define clearerr(stream) \
+          pseudo_clearerr(stream)
+
 #endif
 
 _Optional FILE *pseudo_fopen(const char *filename, const char *mode, const char *file, unsigned long line);
+
+_Optional FILE *pseudo_freopen(const char *filename, const char *mode,
+                               FILE *stream, const char *file,
+                               unsigned long line);
+
+_Optional FILE *pseudo_tmpfile(const char *file, unsigned long line);
 
 void pseudo_rewind(FILE *stream, const char *file, unsigned long line);
 
@@ -105,5 +125,9 @@ int pseudo_fprintf(FILE *stream, const char *format, ...);
 int pseudo_fgetc(FILE *stream, const char *file, unsigned long line);
 
 int pseudo_fputc(int c, FILE *stream, const char *file, unsigned long line);
+
+int pseudo_ferror(FILE *stream);
+
+void pseudo_clearerr(FILE *stream);
 
 #endif
