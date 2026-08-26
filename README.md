@@ -48,8 +48,8 @@ example by adding 'C:o.Fortify' to the list of object files specified to the
 linker. Otherwise, you will get build-time errors like this:
 ```
 ARM Linker: (Error) Undefined symbol(s).
-ARM Linker:     Fortify_malloc, referred to from C:o.CBDebugLib(PseudoIO).
-ARM Linker:     Fortify_free, referred to from C:o.CBDebugLib(PseudoIO).
+ARM Linker:     Fortify_malloc, referred to from C:o.CBDebugLib(PseudoFlex).
+ARM Linker:     Fortify_free, referred to from C:o.CBDebugLib(PseudoFlex).
 ```
   It is important that Fortify is also enabled when compiling code to be
 linked with CBDebugLib. That means #including the "Fortify.h" and
