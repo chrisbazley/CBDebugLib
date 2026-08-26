@@ -53,6 +53,7 @@
                   compound literals.
   CJB: 25-Aug-26: Use CONTAINER_OF to recover flex records from their
                   linked-list items.
+  CJB: 26-Aug-26: Avoid dereferencing void *.
 
 */
 
@@ -115,7 +116,7 @@ int PseudoFlex_alloc(flex_ptr anchor, int n, const char *file, unsigned long lin
      pointer in the specified 'flex anchor'. It is possible to allocate a
      flex block of 0 bytes and therefore Fortify must have been compiled
      without FORTIFY_FAIL_ON_ZERO_MALLOC. */
-  _Optional void *const blk = Fortify_malloc(n, file, line);
+  _Optional char *const blk = Fortify_malloc(n, file, line);
   if (blk == NULL)
   {
     free(pfr);
@@ -200,12 +201,12 @@ int PseudoFlex_extend(flex_ptr anchor, int newsize, const char *file, unsigned l
     /* Attempt to resize the heap block. It is possible to truncate a flex
        block to 0 bytes and therefore Fortify must have been compiled without
        FORTIFY_FAIL_ON_ZERO_MALLOC. */
-    _Optional void *const new_addr = Fortify_realloc(*anchor, newsize, file, line);
+    _Optional char *const new_addr = Fortify_realloc(*anchor, newsize, file, line);
     if (new_addr != NULL)
     {
       /* Update the anchor to point at the resized heap block */
       DEBUG("PseudoFlex: Resized block %p anchored at %p to %d bytes, new address %p",
-            *anchor, (void *)anchor, newsize, new_addr);
+            *anchor, (void *)anchor, newsize, (void *)new_addr);
       *anchor = &*new_addr;
 
       /* Update our record of the current block size */
