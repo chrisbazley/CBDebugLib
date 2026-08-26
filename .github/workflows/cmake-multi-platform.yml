@@ -13,20 +13,19 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.os }} ${{ matrix.c_compiler }} ${{ matrix.build_type }} (Fortify ${{ matrix.use_fortify }})
+    name: ${{ matrix.os }} ${{ matrix.c_compiler }} ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
 
-      # Build Release and Debug with MSVC, GCC and Clang without Fortify.
-      # Add one GCC Debug build with Fortify enabled but _Optional disabled.
+      # Build Release and Debug with MSVC, GCC and Clang. Fortify is enabled
+      # later for Debug builds except the stock Clang configuration.
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl]
-        use_fortify: ["OFF"]
         include:
           - os: windows-latest
             c_compiler: cl
@@ -37,11 +36,6 @@ jobs:
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-          - os: ubuntu-latest
-            build_type: Debug
-            c_compiler: gcc
-            cpp_compiler: g++
-            use_fortify: "ON"
         exclude:
           - os: windows-latest
             c_compiler: gcc
@@ -69,7 +63,7 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DUSE_OPTIONAL=OFF
-        -DUSE_FORTIFY=${{ matrix.use_fortify }}
+        -DUSE_FORTIFY=${{ matrix.build_type == 'Debug' && matrix.c_compiler != 'clang' }}
         -S ${{ github.workspace }}
 
     - name: Build
@@ -83,9 +77,18 @@ jobs:
       run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
 
   optional-clang:
-    name: Build and analyze with _Optional Clang and Fortify
+    name: _Optional Clang ${{ matrix.build_type }} Fortify ${{ matrix.use_fortify }}
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - build_type: Release
+            use_fortify: "OFF"
+          - build_type: Debug
+            use_fortify: "ON"
 
     env:
       OPTIONAL_CLANG_TAG: v1.0.7-optional
@@ -142,32 +145,32 @@ jobs:
             -fsyntax-only \
             "$RUNNER_TEMP/optional-smoke-test.c"
 
-      - name: Configure with _Optional and Fortify
+      - name: Configure with _Optional
         shell: bash
         run: |
           cmake \
             -S "$GITHUB_WORKSPACE" \
-            -B "$GITHUB_WORKSPACE/build-optional" \
+            -B "$GITHUB_WORKSPACE/build-optional-${{ matrix.build_type }}" \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_C_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang" \
             -DCMAKE_CXX_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang++" \
             -DCLANG_TIDY_EXE="$OPTIONAL_CLANG_ROOT/bin/clang-tidy" \
             -DUSE_OPTIONAL=ON \
-            -DUSE_FORTIFY=ON \
+            -DUSE_FORTIFY=${{ matrix.use_fortify }} \
             -DENABLE_CLANG_TIDY=ON
 
       - name: Build and analyze
         shell: bash
         run: |
           cmake \
-            --build "$GITHUB_WORKSPACE/build-optional" \
+            --build "$GITHUB_WORKSPACE/build-optional-${{ matrix.build_type }}" \
             --parallel 2
 
       - name: Test
         shell: bash
         run: |
           ctest \
-            --test-dir "$GITHUB_WORKSPACE/build-optional" \
-            --build-config Debug \
+            --test-dir "$GITHUB_WORKSPACE/build-optional-${{ matrix.build_type }}" \
+            --build-config ${{ matrix.build_type }} \
             --output-on-failure
