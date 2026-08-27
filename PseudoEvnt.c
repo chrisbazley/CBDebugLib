@@ -42,6 +42,8 @@
   CJB: 25-Aug-26: Use CONTAINER_OF to recover handler records from their
                   linked-list items.
   CJB: 25-Aug-26: Initialize temporary objects in their declarations.
+  CJB: 27-Aug-26: Removed _Optional qualifier from the return type of
+                  pseudo_event_get_client_id_block.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -70,7 +72,7 @@
 
 /* These lists of event handlers are currently used only to detect leaks */
 static LinkedList wimp_handlers, tb_handlers, msg_handlers;
-static _Optional IdBlock *client_block;
+static IdBlock *client_block;
 
 typedef struct
 {
@@ -115,7 +117,7 @@ static _Optional _kernel_oserror *oom(void)
   return _kernel_swi(MessageTrans_ErrorLookup, &regs, &regs);
 }
 
-_Optional IdBlock *pseudo_event_get_client_id_block(void)
+IdBlock *pseudo_event_get_client_id_block(void)
 {
   return client_block;
 }

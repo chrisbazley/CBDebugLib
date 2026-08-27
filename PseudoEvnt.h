@@ -27,6 +27,8 @@ Message tokens: None.
 History:
   CJB: 23-Dec-14: Created.
   CJB: 19-Apr-15: Added declaration of pseudo_event_wait_for_idle function.
+  CJB: 27-Aug-26: Removed _Optional qualifier from the return type of
+                  pseudo_event_get_client_id_block.
 */
 
 #ifndef PseudoEvnt_h
@@ -111,7 +113,7 @@ _Optional _kernel_oserror *pseudo_event_deregister_wimp_handlers_for_object(int 
 
 /* The following functions are for use in unit tests */
 
-_Optional IdBlock *pseudo_event_get_client_id_block(void);
+IdBlock *pseudo_event_get_client_id_block(void);
    /*
     * Gets the Toolbox ID block registered upon initialisation.
     * Returns: a pointer to the client application's ID block.
