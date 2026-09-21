@@ -46,6 +46,7 @@
                   pseudo_event_get_client_id_block.
   CJB: 21-Sep-26: Declare variables when they are first assigned.
   CJB: 21-Sep-26: Declare SWI registers with an initialiser.
+                  Ensure only void * is converted to intptr_t.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -112,7 +113,7 @@ static _Optional _kernel_oserror *oom(void)
   static const _kernel_oserror temp = {DUMMY_ERRNO, "NoMem"};
   _kernel_swi_regs regs = {
     .r = {
-      (intptr_t)&temp,
+      (intptr_t)(void *)&temp,
       0, /* use global messages */
       0, /* use an internal buffer */
       0, /* buffer size */
