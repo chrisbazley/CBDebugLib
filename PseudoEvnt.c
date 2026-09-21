@@ -44,6 +44,7 @@
   CJB: 25-Aug-26: Initialize temporary objects in their declarations.
   CJB: 27-Aug-26: Removed _Optional qualifier from the return type of
                   pseudo_event_get_client_id_block.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -288,11 +289,10 @@ _Optional _kernel_oserror *pseudo_event_poll_idle(_Optional int *event_code, _Op
 _Optional _kernel_oserror *pseudo_event_register_toolbox_handler(ObjectId object_id, int event_code, ToolboxEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
   _Optional _kernel_oserror *e = NULL;
-  _Optional PseudoEvent_Toolbox_Handler *record;
 
   DEBUGF("event_register_toolbox_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, (unsigned)object_id, file, line);
 
-  record = Fortify_malloc(sizeof(*record), file, line);
+  _Optional PseudoEvent_Toolbox_Handler *record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
     *record = (PseudoEvent_Toolbox_Handler){
@@ -336,11 +336,10 @@ _Optional _kernel_oserror *pseudo_event_deregister_toolbox_handler(ObjectId obje
 {
   PseudoEvent_Toolbox_Handler to_match = {
     {NULL, NULL}, object_id, event_code, handler, handle};
-  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_toolbox_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, (unsigned)object_id, file, line);
 
-  item = linkedlist_for_each(&tb_handlers, toolbox_handler_matches, &to_match);
+  _Optional LinkedListItem *item = linkedlist_for_each(&tb_handlers, toolbox_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&tb_handlers, &*item);
   Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Toolbox_Handler, list_item),
@@ -382,11 +381,10 @@ _Optional _kernel_oserror *pseudo_event_deregister_toolbox_handlers_for_object(i
 _Optional _kernel_oserror *pseudo_event_register_message_handler(int msg_no, WimpMessageHandler *handler, void *handle, const char *file, unsigned long line)
 {
   _Optional _kernel_oserror *e = NULL;
-  _Optional PseudoEvent_Message_Handler *record;
 
   DEBUGF("event_register_message_handler called for msg 0x%x at %s:%lu\n", msg_no, file, line);
 
-  record = Fortify_malloc(sizeof(*record), file, line);
+  _Optional PseudoEvent_Message_Handler *record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
     *record = (PseudoEvent_Message_Handler){
@@ -429,11 +427,10 @@ _Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, W
 {
   PseudoEvent_Message_Handler to_match = {
     {NULL, NULL}, msg_no, handler, handle};
-  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_message_handler called for msg 0x%x at %s:%lu\n", msg_no, file, line);
 
-  item = linkedlist_for_each(&msg_handlers, message_handler_matches, &to_match);
+  _Optional LinkedListItem *item = linkedlist_for_each(&msg_handlers, message_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&msg_handlers, &*item);
   Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Message_Handler, list_item),
@@ -445,11 +442,10 @@ _Optional _kernel_oserror *pseudo_event_deregister_message_handler(int msg_no, W
 _Optional _kernel_oserror *pseudo_event_register_wimp_handler(ObjectId object_id, int event_code, WimpEventHandler *handler, void *handle, const char *file, unsigned long line)
 {
   _Optional _kernel_oserror *e = NULL;
-  _Optional PseudoEvent_Wimp_Handler *record;
 
   DEBUGF("event_register_wimp_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, object_id, file, line);
 
-  record = Fortify_malloc(sizeof(*record), file, line);
+  _Optional PseudoEvent_Wimp_Handler *record = Fortify_malloc(sizeof(*record), file, line);
   if (record != NULL)
   {
     *record = (PseudoEvent_Wimp_Handler){
@@ -493,11 +489,10 @@ _Optional _kernel_oserror *pseudo_event_deregister_wimp_handler(ObjectId object_
 {
   PseudoEvent_Wimp_Handler to_match = {
     {NULL, NULL}, object_id, event_code, handler, handle};
-  _Optional LinkedListItem *item;
 
   DEBUGF("event_deregister_wimp_handler called for event 0x%x on object 0x%x at %s:%lu\n", event_code, object_id, file, line);
 
-  item = linkedlist_for_each(&wimp_handlers, wimp_handler_matches, &to_match);
+  _Optional LinkedListItem *item = linkedlist_for_each(&wimp_handlers, wimp_handler_matches, &to_match);
   assert(item != NULL);
   linkedlist_remove(&wimp_handlers, &*item);
   Fortify_free(CONTAINER_OF(&*item, PseudoEvent_Wimp_Handler, list_item),

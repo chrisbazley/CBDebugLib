@@ -53,6 +53,7 @@
                   linked-list items.
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
 
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 #undef FORTIFY /* Prevent macro redirection of toolbox_... calls to
@@ -153,13 +154,12 @@ static bool template_name_matches(LinkedList *list, LinkedListItem *item, void *
   const char *template_name = arg;
   char buffer[256];
   int nbytes;
-  _Optional _kernel_oserror *e;
 
   assert(list == &objects);
   assert(record != NULL);
   assert(template_name != NULL);
 
-  e = toolbox_get_template_name(0, record->object_id, buffer, sizeof(buffer), &nbytes);
+  _Optional _kernel_oserror *e = toolbox_get_template_name(0, record->object_id, buffer, sizeof(buffer), &nbytes);
   if (e != NULL)
   {
     DEBUGF("toolbox_get_template_name error: 0x%x %s\n", e->errnum, e->errmess);
@@ -177,12 +177,11 @@ static bool template_name_matches(LinkedList *list, LinkedListItem *item, void *
 
 ObjectId pseudo_toolbox_find_by_template_name(char *template_name)
 {
-  _Optional LinkedListItem *item;
   ObjectId id;
 
   DEBUGF("PseudoTbox: Finding object created from template '%s'\n", template_name);
   assert(template_name != NULL);
-  item = linkedlist_for_each(&objects, template_name_matches, template_name);
+  _Optional LinkedListItem *item = linkedlist_for_each(&objects, template_name_matches, template_name);
   if (item == NULL)
   {
     id = NULL_ObjectId;
@@ -224,10 +223,9 @@ static bool object_id_matches(LinkedList *list, LinkedListItem *item, void *arg)
 
 void pseudo_toolbox_object_deleted(ObjectId id)
 {
-  _Optional LinkedListItem *item;
 
   DEBUGF("PseudoTbox: Object 0x%x was deleted\n", id);
-  item = linkedlist_for_each(&objects, object_id_matches, &id);
+  _Optional LinkedListItem *item = linkedlist_for_each(&objects, object_id_matches, &id);
   if (item != NULL)
   {
     linkedlist_remove(&objects, &*item);

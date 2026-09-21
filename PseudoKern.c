@@ -26,6 +26,7 @@
   CJB: 24-Aug-26: Use the _Optional qualifier for referenced types where
                   the pointer can be null.
   CJB: 25-Aug-26: Cast _kernel_oserror pointer to intptr_t instead of int.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 #undef FORTIFY /* Prevent macro redirection of _kernel_... calls to
@@ -260,10 +261,9 @@ _Optional _kernel_oserror *pseudokern_getenv(const char *name,
                                              const char *file,
                                              unsigned long line)
 {
-  _Optional _kernel_oserror *e;
 
   assert(name != NULL);
-  e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
   if (e == NULL)
     e = _kernel_getenv(name, buffer, size);
 
@@ -275,10 +275,9 @@ _Optional _kernel_oserror *pseudokern_setenv(const char *name,
                                              const char *file,
                                              unsigned long line)
 {
-  _Optional _kernel_oserror *e;
 
   assert(name != NULL);
-  e = pseudokern_fail(file, line);
+  _Optional _kernel_oserror *e = pseudokern_fail(file, line);
   if (e == NULL)
     e = _kernel_setenv(name, value);
 
