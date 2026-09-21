@@ -53,6 +53,7 @@
   CJB: 07-Jun-26: Guard against log file name buffer overflow.
   CJB: 08-Jun-26: Avoid mixed-signedness comparison in log file name
                   buffer overflow check.
+  CJB: 21-Sep-26: Declare variables when they are first assigned.
 */
 
 /* ISO library headers */
@@ -302,11 +303,10 @@ void debug_vprintf(const char *format, va_list arg)
       readp = formatted;
       while (*readp != '\0')
       {
-        _Optional char *eol;
-        size_t  len, copied;
+        size_t  len;
 
         /* Search for the next line feed in the string to be output */
-        eol = strchr(readp, '\n');
+        _Optional char *eol = strchr(readp, '\n');
         if (eol == NULL)
           len = strlen(readp); /* output remainder of string */
         else
@@ -314,7 +314,7 @@ void debug_vprintf(const char *format, va_list arg)
 
         /* Guard against overrunning the end of the buffer
            by discarding the end of overlong lines */
-        copied = sizeof(line) - 1 - accumulated;
+        size_t copied = sizeof(line) - 1 - accumulated;
         if (len < copied)
           copied = len;
         (void)strncat(line, readp, copied);
