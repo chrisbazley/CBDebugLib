@@ -45,6 +45,7 @@
   CJB: 27-Aug-26: Removed _Optional qualifier from the return type of
                   pseudo_event_get_client_id_block.
   CJB: 21-Sep-26: Declare variables when they are first assigned.
+  CJB: 21-Sep-26: Declare SWI registers with an initialiser.
 */
 
 #undef FORTIFY /* Prevent macro redirection of event_... calls to
@@ -109,12 +110,14 @@ static _Optional _kernel_oserror *oom(void)
   /* Look up a generic out-of-memory error. Note that this also takes
      care of setting _kernel_last_oserror. */
   static const _kernel_oserror temp = {DUMMY_ERRNO, "NoMem"};
-  _kernel_swi_regs regs;
-
-  regs.r[0] = (intptr_t)&temp;
-  regs.r[1] = 0; /* use global messages */
-  regs.r[2] = 0; /* use an internal buffer */
-  regs.r[3] = 0; /* buffer size */
+  _kernel_swi_regs regs = {
+    .r = {
+      (intptr_t)&temp,
+      0, /* use global messages */
+      0, /* use an internal buffer */
+      0, /* buffer size */
+    }
+  };
   return _kernel_swi(MessageTrans_ErrorLookup, &regs, &regs);
 }
 
