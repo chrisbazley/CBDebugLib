@@ -61,6 +61,7 @@
                   Change the type of msg_count to match
                   pseudo_wimp_get_message_count.
   CJB: 25-Aug-26: Initialize temporary redraw blocks in their declarations.
+  CJB: 21-Sep-26: Ensure only void * is converted to intptr_t.
 */
 
 #undef FORTIFY /* Prevent macro redirection of wimp_... calls to
@@ -318,7 +319,7 @@ _Optional _kernel_oserror *pseudo_wimp_transfer_block(int sh, void *sbuf, int dh
 _Optional _kernel_oserror *pseudo_wimp_drag_box(_Optional WimpDragBox *block, const char *file, unsigned long line)
 {
   DEBUGF("wimp_drag_box called at %s:%lu with %p\n", file, line, (void *)block);
-  if (block && (intptr_t)block != -1) {
+  if (block && (intptr_t)(void *)block != -1) {
     DEBUGF("wimp_window: %d drag_type: %d\n"
            "dragging_box: {%d,%d,%d,%d}\n"
            "parent_box: {%d,%d,%d,%d}\n",

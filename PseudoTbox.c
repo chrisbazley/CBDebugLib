@@ -55,6 +55,7 @@
 
   CJB: 21-Sep-26: Declare variables when they are first assigned.
   CJB: 21-Sep-26: Declare SWI registers with an initialiser.
+                  Ensure only void * is converted to intptr_t.
 */
 
 #undef FORTIFY /* Prevent macro redirection of toolbox_... calls to
@@ -271,7 +272,7 @@ _Optional _kernel_oserror *pseudo_toolbox_create_object(unsigned int flags, void
     static const _kernel_oserror temp = {DUMMY_ERRNO, "NoMem"};
     _kernel_swi_regs regs = {
       .r = {
-        (intptr_t)&temp,
+        (intptr_t)(void *)&temp,
         0, /* use global messages */
         0, /* use an internal buffer */
         0, /* buffer size */
