@@ -1,67 +1,15 @@
 # CBDebugLib
 (C) 2018 Christopher Bazley
 
-Release 8 (11 Apr 2025)
+Release 9 (21 Sep 2026)
 
 Introduction
 ------------
-  This C library provides debugging facilities for RISC OS software
-development. It can have a large number of external dependencies, including
-most of the libraries supplied with the Acorn C/C++ package.
-
-  Its most useful feature is the ability to usurp calls to Acorn's flex
-library functions and redirect them to Simon P. Bullen's fortified memory
-allocation shell. This allows debugging of out-of-bounds memory accesses and
-simulation of allocation failure.
-
-  Similarly, calls to many functions in the Toolbox and Wimp libraries can
-be intercepted in order to simulate them returning an error value. This
-allows stress-testing of application programs.
-
-Fortified memory allocation
----------------------------
-  I use Fortify to find memory leaks in my applications, detect corruption
-of the heap (e.g. caused by writing beyond the end of a heap block), and do
-stress testing (by causing some memory allocations to fail). Fortify is
-available separately from this web site:
-http://web.archive.org/web/20020615230941/www.geocities.com/SiliconValley/Horizon/8596/fortify.html
-
-  By default, Fortify only intercepts the ANSI standard memory allocation
-functions (e.g. 'malloc', 'free' and 'realloc'). This limits its usefulness
-as a debugging tool if your program also uses different memory allocator such
-as Acorn's 'flex' library.
-
-  Therefore, I wrote the 'PseudoFlex' module of CBDebugLib, to enable Fortify
-to be used to debug code that was designed to use the 'flex' library. It uses
-macros to intercept calls to 'flex_alloc', 'flex_midextend', 'flex_free',
-etc. These are replaced with calls to the equivalent 'PseudoFlex' functions,
-which emulate the 'flex' library using Fortify versions of the ANSI C memory
-allocation functions.
-
-  The source file name and line number of the calling code are passed
-straight through so that you can see where leaked memory blocks were actually
-allocated (i.e. at the intercepted call to 'flex_alloc' rather than the
-subsequent invocation of 'Fortify_malloc' within c.PseudoFlex).
-
-  Programs linked with CBDebugLib must also be linked with Fortify, for
-example by adding 'C:o.Fortify' to the list of object files specified to the
-linker. Otherwise, you will get build-time errors like this:
-```
-ARM Linker: (Error) Undefined symbol(s).
-ARM Linker:     Fortify_malloc, referred to from C:o.CBDebugLib(PseudoFlex).
-ARM Linker:     Fortify_free, referred to from C:o.CBDebugLib(PseudoFlex).
-```
-  It is important that Fortify is also enabled when compiling code to be
-linked with CBDebugLib. That means #including the "Fortify.h" and
-"PseudoFlex.h" headers in each of your source files, and pre-defining the
-C pre-processor symbol 'FORTIFY'. If you are using the Acorn C compiler
-then this can be done by adding '-DFORTIFY' to the command line.
-
-  Linking unfortified programs with CBDebugLib will cause run time errors
-when your program tries to reallocate or free a heap block allocated within
-CBDebugLib, or CBDebugLib tries to reallocate or free a block allocated by
-your program. Typically this manifests as 'Flex memory error' or
-'Unrecoverable error in run time system: free failed, (heap overwritten)'.
+  This C library provides configurable debugging output for RISC OS software.
+The pseudo interfaces which intercept library calls for error injection and
+Fortify checking have moved to CBPseudoLib. Their public header names are
+unchanged, but programs using them must now link with CBPseudoLib as well as
+CBDebugLib.
 
 Rebuilding the library
 ----------------------
@@ -196,6 +144,10 @@ Release 7 (19 May 2024)
 Release 8 (11 Apr 2025)
 - Dogfooding the _Optional qualifier.
 - Stop treating NULL as a valid value of va_list.
+
+Release 9 (21 Sep 2026)
+- Moved the pseudo interfaces to CBPseudoLib.
+- Removed generic macro definitions now provided by CBUtilLib.
 
 Contact details
 ---------------
