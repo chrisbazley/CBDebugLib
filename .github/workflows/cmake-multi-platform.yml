@@ -62,6 +62,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DWARNINGS_AS_ERRORS=ON
         -DUSE_OPTIONAL=OFF
         -DUSE_FORTIFY=${{ matrix.build_type == 'Debug' && matrix.c_compiler != 'clang' }}
         -S ${{ github.workspace }}
@@ -156,6 +157,7 @@ jobs:
             -DCMAKE_C_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang" \
             -DCMAKE_CXX_COMPILER="$OPTIONAL_CLANG_ROOT/bin/clang++" \
             -DCLANG_TIDY_EXE="$OPTIONAL_CLANG_ROOT/bin/clang-tidy" \
+            -DWARNINGS_AS_ERRORS=ON \
             -DUSE_OPTIONAL=ON \
             -DUSE_FORTIFY=${{ matrix.use_fortify }} \
             -DENABLE_CLANG_TIDY=ON
