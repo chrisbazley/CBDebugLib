@@ -22,6 +22,7 @@
   CJB: 21-Sep-26: Remove generic macros now provided by CBUtilLib and the
                   definitions used only by pseudo interfaces moved to
                   CBPseudoLib.
+  CJB: 28-Nov-26: Preserve the standard library's definition of NULL.
 */
 
 #ifndef CBDebMisc_h
