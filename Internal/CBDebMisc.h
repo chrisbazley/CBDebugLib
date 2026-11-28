@@ -30,9 +30,6 @@
 #ifdef USE_OPTIONAL
 #include <stdio.h>
 
-#undef NULL
-#define NULL ((_Optional void *)0)
-
 static inline _Optional FILE *optional_fopen(const char *name, const char *mode)
 {
     return fopen(name, mode);
